@@ -321,7 +321,6 @@ export const argTooltipPlacement = (value: DirectiveBinding['value'], argTooltip
             argTooltip?.style.setProperty(`--v-tooltip-${key}`, val);
             break;
           case 'hide':
-            /****  arg tooltip ****/
             watch(
               () => val,
               () => {

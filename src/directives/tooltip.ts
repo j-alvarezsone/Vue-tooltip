@@ -85,8 +85,7 @@ type Placement =
   | 'rightCenter'
   | 'rightTop'
   | 'rightBottom'
-  | 'serviceDelete'
-  | 'grid';
+  | 'serviceDelete';
 
 type TooltipContent = {
   text: string;

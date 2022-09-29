@@ -292,29 +292,4 @@ export const tooltipModifiers = (modifiers: DirectiveBinding['modifiers'], el: H
       );
     }
   }
-
-  /************
-   ********* grid ********
-   ************/
-  if (modifiers.grid) {
-    el.style.removeProperty(Tooltip.bottom);
-
-    el.style.setProperty(Tooltip.top, '0');
-    el.style.setProperty(Tooltip.left, '0');
-    el.style.setProperty(Tooltip.translate, 'translateY(calc(-80% - 12px))');
-
-    /****  arrow ****/
-    if (modifiers.arrow) {
-      el.style.removeProperty(Tooltip.arrowTop);
-      el.style.removeProperty(Tooltip.arrowRight);
-
-      el.style.setProperty(Tooltip.arrowBottom, '0');
-      el.style.setProperty(Tooltip.arrowLeft, '50%');
-      el.style.setProperty(Tooltip.arrowTranslate, 'translate(-50%, 100%)');
-      el.style.setProperty(
-        Tooltip.arrowBorderColor,
-        'var(--v-tooltip-backgroundColor) transparent transparent transparent',
-      );
-    }
-  }
 };
