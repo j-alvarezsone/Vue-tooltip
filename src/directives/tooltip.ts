@@ -23,27 +23,27 @@ export enum Tooltip {
 }
 
 export const tooltip = {
-  mounted: (el: HTMLElement, binding: DirectiveBinding): void => {
-    if (typeof binding.value === 'object' && binding.value.text) {
+  mounted: (el: HTMLElement, { value, modifiers, arg }: DirectiveBinding): void => {
+    if (typeof value === 'object' && value.text) {
       el.classList.add('tooltip-parent');
     }
 
-    if (typeof binding.value === 'string' && binding.value) {
+    if (typeof value === 'string' && value) {
       el.classList.add('tooltip-parent');
     }
 
-    updateTooltip(el, binding.value, binding.modifiers, binding.arg);
+    updateTooltip(el, value, modifiers, arg);
   },
-  beforeUpdate: (el: HTMLElement, binding: DirectiveBinding): void => {
-    if (typeof binding.value === 'object' && binding.value.text) {
+  beforeUpdate: (el: HTMLElement, { value, modifiers, arg }: DirectiveBinding): void => {
+    if (typeof value === 'object' && value.text) {
       el.classList.add('tooltip-parent');
     }
 
-    if (typeof binding.value === 'string' && binding.value) {
+    if (typeof value === 'string' && value) {
       el.classList.add('tooltip-parent');
     }
 
-    updateTooltip(el, binding.value, binding.modifiers, binding.arg);
+    updateTooltip(el, value, modifiers, arg);
   },
 };
 export interface ThemeOptions {
