@@ -39,57 +39,29 @@ app.mount('#app');
 
 ```
 <template>
-    <div class="container">
-      <h2>Top</h2>
-      <div class="tooltip_container">
-        <p v-tooltip.arrow="'Top center'">Center</p>
-        <p v-tooltip.topRight.arrow="'Top right'">right</p>
-        <p v-tooltip.topLeft.arrow="'Top left'">left</p>
-      </div>
-    </div>
-    <div class="container">
-      <h2>Bottom</h2>
-      <div class="tooltip_container">
-        <p v-tooltip.bottomCenter.arrow="'Bottom center'">center</p>
-        <p v-tooltip.bottomRight.topRight.arrow="'Bottom right'">right</p>
-        <p v-tooltip.bottomLeft.topLeft.arrow="'Bottom left'">left</p>
-      </div>
-    </div>
-    <div class="container">
-      <h2>Left</h2>
-      <div class="tooltip_container">
-        <p v-tooltip.leftCenter.arrow="'Left center'">center</p>
-        <p v-tooltip.leftTop.topRight.arrow="'Left top'">top</p>
-        <p v-tooltip.leftBottom.topLeft.arrow="'Left bottom'">bottom</p>
-      </div>
-    </div>
-    <div class="container">
-      <h2>Right</h2>
-      <div class="tooltip_container">
-        <p v-tooltip.rightCenter.arrow="'Right center'">center</p>
-        <p v-tooltip.rightTop.topRight.arrow="'Right top'">top</p>
-        <p v-tooltip.rightBottom.topLeft.arrow="'Right bottom'">bottom</p>
-      </div>
-    </div>
+  <p v-tooltip.arrow="'Top center'">Center</p>
+  <p v-tooltip.topRight.arrow="'Top right'">right</p>
+  <p v-tooltip.topLeft.arrow="'Top left'">left</p>
 </template>
 
-<style scoped>
-  .container {
-    text-align: center;
-    border: 1px solid;
-    width: 100%;
-    max-width: 400px;
-  }
-  .tooltip_container {
-    padding: 20px;
-    margin-top: 40px;
-    display: flex;
-    justify-content: center;
-    gap: 40px;
-  }
-</style>
+```
+
+![Top center](./src/../public/img/tooltip/top_center.png?raw=true)
+![Top right](./src/../public/img/tooltip/top_right.png?raw=true)
+![Top left](./src/../public/img/tooltip/top_left.png?raw=true)
 
 ```
+<template>
+  <p v-tooltip.bottomCenter.arrow="'Bottom center'">center</p>
+  <p v-tooltip.bottomRight.topRight.arrow="'Bottom right'">right</p>
+  <p v-tooltip.bottomLeft.topLeft.arrow="'Bottom left'">left</p>
+</template>
+
+```
+
+![Bottom center](./src/../public/img/tooltip/bottom_center.png?raw=true)
+![Bottom right](./src/../public/img/tooltip/bottom_right.png?raw=true)
+![Bottom left](./src/../public/img/tooltip/bottom_left.png?raw=true)
 
 ### By object
 
@@ -97,49 +69,9 @@ app.mount('#app');
 <b>placement</b>
 
 ```
-
 <script lang="ts" setup>
   import { tooltipContent } from '../directives/tooltip';
   import type { ThemeOptions } from '../directives/tooltip';
-
-  const topCenterTheme: ThemeOptions = {
-    placement: 'topCenter',
-    backgroundColor: '#fff',
-    color: '#000',
-  };
-
-  const topRightTheme: ThemeOptions = {
-    placement: 'topRight',
-    backgroundColor: '#fff',
-    color: '#000',
-  };
-
-  const topLeftTheme: ThemeOptions = {
-    placement: 'topLeft',
-    backgroundColor: '#fff',
-    color: '#000',
-  };
-
-  const bottomCenterTheme: ThemeOptions = {
-    placement: 'bottomCenter',
-    backgroundColor: '#acdcee',
-    color: '#000',
-    fontSize: '20px',
-  };
-
-  const bottomRightTheme: ThemeOptions = {
-    placement: 'bottomRight',
-    backgroundColor: '#acdcee',
-    color: '#000',
-    fontSize: '20px',
-  };
-
-  const bottomLeftTheme: ThemeOptions = {
-    placement: 'bottomLeft',
-    backgroundColor: '#acdcee',
-    color: '#000',
-    fontSize: '20px',
-  };
 
   const leftCenterTheme: ThemeOptions = {
     placement: 'leftCenter',
@@ -158,6 +90,31 @@ app.mount('#app');
     backgroundColor: '#43B883',
     color: '#fff',
   };
+</script>
+
+
+<template>
+  <p v-tooltip="tooltipContent({ text: 'Left center', themeOptions: leftCenterTheme, displayArrow: true })">
+    Center
+  </p>
+  <p v-tooltip="tooltipContent({ text: 'Left top', themeOptions: leftTopTheme, displayArrow: true })">
+    top
+  </p>
+  <p v-tooltip="tooltipContent({ text: 'Left bottom', themeOptions: leftBottomTheme, displayArrow: true })">
+    bottom
+  </p>
+</template>
+
+```
+
+![Left center](./src/../public/img/tooltip/left_center.png?raw=true)
+![Left top](./src/../public/img/tooltip/left_top.png?raw=true)
+![Left bottom](./src/../public/img/tooltip/left_bottom.png?raw=true)
+
+```
+<script lang="ts" setup>
+  import { tooltipContent } from '../directives/tooltip';
+  import type { ThemeOptions } from '../directives/tooltip';
 
   const rightCenterTheme: ThemeOptions = {
     placement: 'rightCenter',
@@ -178,75 +135,24 @@ app.mount('#app');
   };
 </script>
 
-<template>
-    <div class="container">
-      <h2>Top</h2>
-      <div class="tooltip_container">
-        <p v-tooltip="tooltipContent({ text: 'Top center', themeOptions: topCenterTheme, displayArrow: true })">
-          Center
-        </p>
-        <p v-tooltip="tooltipContent({ text: 'Top right', themeOptions: topRightTheme, displayArrow: true })">right</p>
-        <p v-tooltip="tooltipContent({ text: 'Top left', themeOptions: topLeftTheme, displayArrow: true })">left</p>
-      </div>
-    </div>
-    <div class="container">
-      <h2>Bottom</h2>
-      <div class="tooltip_container">
-        <p v-tooltip="tooltipContent({ text: 'Bottom center', themeOptions: bottomCenterTheme, displayArrow: true })">
-          Center
-        </p>
-        <p v-tooltip="tooltipContent({ text: 'Bottom right', themeOptions: bottomRightTheme, displayArrow: true })">
-          right
-        </p>
-        <p v-tooltip="tooltipContent({ text: 'Bottom left', themeOptions: bottomLeftTheme, displayArrow: true })">
-          left
-        </p>
-      </div>
-    </div>
-    <div class="container">
-      <h2>Left</h2>
-      <div class="tooltip_container">
-        <p v-tooltip="tooltipContent({ text: 'Left center', themeOptions: leftCenterTheme, displayArrow: true })">
-          Center
-        </p>
-        <p v-tooltip="tooltipContent({ text: 'Left top', themeOptions: leftTopTheme, displayArrow: true })">top</p>
-        <p v-tooltip="tooltipContent({ text: 'Left bottom', themeOptions: leftBottomTheme, displayArrow: true })">
-          bottom
-        </p>
-      </div>
-    </div>
-    <div class="container">
-      <h2>Right</h2>
-      <div class="tooltip_container">
-        <p v-tooltip="tooltipContent({ text: 'Right center', themeOptions: rightCenterTheme, displayArrow: true })">
-          Center
-        </p>
-        <p v-tooltip="tooltipContent({ text: 'Right top', themeOptions: rightTopTheme, displayArrow: true })">top</p>
-        <p v-tooltip="tooltipContent({ text: 'Right bottom', themeOptions: rightBottomTheme, displayArrow: true })">
-          bottom
-        </p>
-      </div>
-    </div>
 
+<template>
+  <p v-tooltip="tooltipContent({ text: 'Right center', themeOptions: rightCenterTheme, displayArrow: true })">
+    Center
+  </p>
+  <p v-tooltip="tooltipContent({ text: 'Right top', themeOptions: rightTopTheme, displayArrow: true })">
+    top
+  </p>
+  <p v-tooltip="tooltipContent({ text: 'Right bottom', themeOptions: rightBottomTheme, displayArrow: true })">
+    bottom
+  </p>
 </template>
 
-<style scoped>
-  .container {
-    text-align: center;
-    border: 1px solid;
-    width: 100%;
-    max-width: 400px;
-  }
-  .tooltip_container {
-    padding: 20px;
-    margin-top: 40px;
-    display: flex;
-    justify-content: center;
-    gap: 40px;
-  }
-</style>
-
 ```
+
+![Right center](./src/../public/img/tooltip/right_center.png?raw=true)
+![Right top](./src/../public/img/tooltip/right_top.png?raw=true)
+![Right bottom](./src/../public/img/tooltip/right_bottom.png?raw=true)
 
 ### By arg
 
@@ -314,6 +220,8 @@ app.mount('#app');
 </style>
 
 ```
+
+![Arg](./src/../public/img/tooltip/arg.png?raw=true)
 
 ### Available interface and type
 

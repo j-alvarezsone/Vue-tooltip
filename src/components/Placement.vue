@@ -54,7 +54,7 @@
   };
 
   const leftBottomTheme: ThemeOptions = {
-    placement: 'rightBottom',
+    placement: 'leftBottom',
     backgroundColor: '#43B883',
     color: '#fff',
   };
