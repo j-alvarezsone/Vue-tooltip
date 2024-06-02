@@ -31,6 +31,7 @@
       <p v-tooltip="{ content: 'Padding', placement: 'top', padding: '2rem' }">Padding</p>
       <p v-tooltip="{ content: 'Max Width', placement: 'top', maxWidth: '3rem' }">Max Width</p>
       <p v-tooltip="{ content: 'Z Index', placement: 'top', zIndex: 20 }">Z Index</p>
+      <p v-tooltip="{ content: 'Disabled', placement: 'top', disabled: true }">Disabled</p>
     </div>
     <div class="placement">
       <p v-tooltip="{ content: ComponentA, placement: 'top', maxWidth: '1000px' }">Component</p>
