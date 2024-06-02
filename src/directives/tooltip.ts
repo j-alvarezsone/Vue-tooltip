@@ -305,7 +305,7 @@ function handleMouseEnter(el: HTMLElement, container: HTMLDivElement, binding: D
   const isFilePresent =
     binding.value && (binding.value.__file || (binding.value.content && binding.value.content.__file));
 
-  if ((isValueMissing || isContentMissing) && !isFilePresent) {
+  if (((isValueMissing || isContentMissing) && !isFilePresent) || binding.value?.disabled) {
     clearTooltip(binding, container);
     return;
   }
