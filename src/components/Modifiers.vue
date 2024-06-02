@@ -1,53 +1,67 @@
 <template>
-  <h1 :style="{ display: 'flex', 'justify-content': 'center', 'margin-bottom': '20px' }">Modifiers</h1>
-  <div :style="{ display: 'flex', gap: '100px', 'flex-wrap': 'wrap', 'justify-content': 'center' }">
-    <div class="container">
-      <h2>Top</h2>
-      <div class="tooltip_container">
-        <p v-tooltip.arrow="'Top center'">Center</p>
-        <p v-tooltip.topRight.arrow="'Top right'">right</p>
-        <p v-tooltip.topLeft.arrow="'Top left'">left</p>
-      </div>
+  <h1>Modifiers</h1>
+  <br />
+  <div class="container">
+    <div class="placement">
+      <p v-tooltip="'Top'">Top</p>
+      <p v-tooltip.topStart="'Top Start'">Top Start</p>
+      <p v-tooltip.topEnd="'Top End'">Top End</p>
     </div>
-    <div class="container">
-      <h2>Bottom</h2>
-      <div class="tooltip_container">
-        <p v-tooltip.bottomCenter.arrow="'Bottom center'">center</p>
-        <p v-tooltip.bottomRight.topRight.arrow="'Bottom right'">right</p>
-        <p v-tooltip.bottomLeft.topLeft.arrow="'Bottom left'">left</p>
-      </div>
+    <div class="placement">
+      <p v-tooltip.bottom="'Bottom'">Bottom</p>
+      <p v-tooltip.bottomStart="'Bottom Start'">Bottom Start</p>
+      <p v-tooltip.bottomEnd="'Bottom End'">Bottom End</p>
     </div>
-    <div class="container">
-      <h2>Left</h2>
-      <div class="tooltip_container">
-        <p v-tooltip.leftCenter.arrow="'Left center'">center</p>
-        <p v-tooltip.leftTop.topRight.arrow="'Left top'">top</p>
-        <p v-tooltip.leftBottom.topLeft.arrow="'Left bottom'">bottom</p>
-      </div>
+    <div class="placement">
+      <p v-tooltip.left="'Left'">Left</p>
+      <p v-tooltip.leftStart="'Left Start'" class="space">Left Start</p>
+      <p v-tooltip.leftEnd="'Left End'" class="space">Left End</p>
     </div>
-    <div class="container">
-      <h2>Right</h2>
-      <div class="tooltip_container">
-        <p v-tooltip.rightCenter.arrow="'Right center'">center</p>
-        <p v-tooltip.rightTop.topRight.arrow="'Right top'">top</p>
-        <p v-tooltip.rightBottom.topLeft.arrow="'Right bottom'">bottom</p>
-      </div>
+    <div class="placement">
+      <p v-tooltip.right="'Right'">Right</p>
+      <p v-tooltip.rightStart="'Right Start'" class="space">Right Start</p>
+      <p v-tooltip.rightEnd="'Right End'" class="space">Right End</p>
+    </div>
+    <div class="placement">
+      <p v-tooltip.bgLight="'Light Background'">Light Background</p>
+      <p v-tooltip.noArrow="'No Arrow'">No Arrow</p>
+      <p v-tooltip.autoHide="'Auto Hide'">Auto Hide</p>
+      <p v-tooltip.html="'<h1>Html</h1>'">Html</p>
+    </div>
+    <div class="placement">
+      <p v-tooltip="ComponentA">Component</p>
     </div>
   </div>
 </template>
 
+<script lang="ts" setup>
+  import ComponentA from './ComponentA.vue';
+</script>
+
 <style scoped>
-  .container {
+  h1 {
     text-align: center;
-    border: 1px solid;
-    width: 100%;
-    max-width: 400px;
   }
-  .tooltip_container {
-    padding: 20px;
-    margin-top: 40px;
+
+  .container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 6rem;
+    place-items: center;
+    border: 1px solid gray;
+    padding: 3rem;
+  }
+
+  .space {
+    width: 60px;
+  }
+
+  .placement {
+    width: max-content;
     display: flex;
+    align-items: center;
     justify-content: center;
-    gap: 40px;
+    gap: 4rem;
   }
 </style>

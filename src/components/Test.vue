@@ -1,15 +1,13 @@
 <script lang="ts" setup>
   import Modifiers from './Modifiers.vue';
-  import Placement from './Placement.vue';
-  import Arg from './Arg.vue';
+  import ObjectPlacement from './ObjectPlacement.vue';
 </script>
 
 <template>
   <Modifiers />
   <br />
-  <Placement />
+  <ObjectPlacement />
   <br />
-  <Arg />
 </template>
 
 <style scoped></style>
