@@ -113,12 +113,12 @@ function updateTooltip(el: HTMLElement, { value, modifiers, arg }: DirectiveBind
     setPlacement(el, container, modifiers, arg, value.placement);
   }
 
-  if (modifiers.bgLight) {
+  if (modifiers.bgLight || value?.bgLight) {
     container.style.setProperty(TOOLTIP.BACKGROUND_COLOR, 'white');
     container.style.setProperty(TOOLTIP.TEXT_COLOR, '#374151');
   }
 
-  if (modifiers.noArrow) {
+  if (modifiers.noArrow || value?.noArrow) {
     if (arrow && document.body.contains(arrow)) {
       document.body.removeChild(arrow);
       arrow = null;
@@ -304,7 +304,7 @@ function handleMouseEnter(el: HTMLElement, container: HTMLDivElement, binding: D
   const isFilePresent =
     binding.value && (binding.value.__file || (binding.value.content && binding.value.content.__file));
 
-  if ((isValueMissing || isContentMissing) && !isFilePresent) {
+  if (((isValueMissing || isContentMissing) && !isFilePresent) || binding.value?.disabled) {
     clearTooltip(binding, container);
     return;
   }
