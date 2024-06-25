@@ -29,13 +29,13 @@
       <p v-tooltip.html="'<h1>Html</h1>'">Html</p>
     </div>
     <div class="placement">
-      <p v-tooltip="ComponentA">Component</p>
+      <p v-tooltip="TooltipTest">Component</p>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import ComponentA from './ComponentA.vue';
+  import TooltipTest from '../tooltip/TooltipTest.vue';
 </script>
 
 <style scoped>

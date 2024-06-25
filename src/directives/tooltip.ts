@@ -9,6 +9,7 @@ const TOOLTIP = {
   LEFT: '--tooltip-left',
   RIGHT: '--tooltip-right',
   MAX_WIDTH: '--tooltip-maxWidth',
+  MAX_HEIGHT: '--tooltip-maxHeight',
   FONT_SIZE: '--tooltip-fontSize',
   BACKGROUND_COLOR: '--tooltip-backgroundColor',
   TEXT_COLOR: '--tooltip-textColor',
@@ -39,6 +40,7 @@ let observer: IntersectionObserver | null = null;
 let mutationObserver: MutationObserver | null = null;
 let hideTimeout: number | null = null;
 let wheelEventHandler: (() => void) | null = null;
+let arrow: HTMLElement | null = null;
 
 export const tooltip: Directive = {
   beforeMount(el: HTMLElement, binding: DirectiveBinding) {
@@ -89,16 +91,7 @@ function updateTooltip(el: HTMLElement, { value, modifiers, arg }: DirectiveBind
   } else if (typeof value === 'object') {
     if (value.__file || (value.content && value.content.__file)) {
       isComponent = true;
-
-      const component = defineAsyncComponent(
-        () =>
-          import(
-            /* @vite-ignore */
-            value.__file || value.content.__file
-          ),
-      );
-
-      render(h(component), container);
+      loadDynamicComponent(value, container);
 
       mutationObserver = new MutationObserver(() => {
         setPlacement(el, container, modifiers, arg, value.placement);
@@ -114,20 +107,22 @@ function updateTooltip(el: HTMLElement, { value, modifiers, arg }: DirectiveBind
     }
   }
   container.className = '';
-  container.classList.add('tooltip', 'tooltip-arrow');
+  container.classList.add('tooltip');
 
   if (!isComponent) {
     setPlacement(el, container, modifiers, arg, value.placement);
   }
 
-  if (modifiers.bgLight || value?.bgLight) {
+  if (modifiers.bgLight) {
     container.style.setProperty(TOOLTIP.BACKGROUND_COLOR, 'white');
     container.style.setProperty(TOOLTIP.TEXT_COLOR, '#374151');
-    container.style.setProperty(TOOLTIP.ARROW_BORDER_COLOR, 'white');
   }
 
-  if (modifiers.noArrow || value?.noArrow) {
-    container.classList.remove('tooltip-arrow');
+  if (modifiers.noArrow) {
+    if (arrow && document.body.contains(arrow)) {
+      document.body.removeChild(arrow);
+      arrow = null;
+    }
   }
 }
 
@@ -141,6 +136,10 @@ function applyObjectTooltipStyles(value: any, container: HTMLDivElement) {
 
   if (value?.maxWidth) {
     container.style.setProperty(TOOLTIP.MAX_WIDTH, value.maxWidth);
+  }
+
+  if (value?.maxHeight) {
+    container.style.setProperty(TOOLTIP.MAX_HEIGHT, value.maxHeight);
   }
 
   if (value?.fontSize) {
@@ -166,116 +165,116 @@ function setPlacement(
   switch (position || true) {
     case modifiers.left:
     case TOOLTIP_PLACEMENTS.LEFT:
-      alignLeft(el, container);
-      isOutOfBounds(container, arg, modifiers, (isOut) => {
+      alignLeft(el, container, modifiers);
+      isOutOfBounds(container, arg, (isOut) => {
         if (isOut) {
-          alignRight(el, container);
+          alignRight(el, container, modifiers);
         }
       });
       break;
     case modifiers.leftStart:
     case TOOLTIP_PLACEMENTS.LEFT_START:
-      alignLeftStart(el, container);
-      isOutOfBounds(container, arg, modifiers, (isOut) => {
+      alignLeftStart(el, container, modifiers);
+      isOutOfBounds(container, arg, (isOut) => {
         if (isOut) {
-          alignRightStart(el, container);
+          alignRightStart(el, container, modifiers);
         }
       });
       break;
     case modifiers.leftEnd:
     case TOOLTIP_PLACEMENTS.LEFT_END:
-      alignLeftEnd(el, container);
-      isOutOfBounds(container, arg, modifiers, (isOut) => {
+      alignLeftEnd(el, container, modifiers);
+      isOutOfBounds(container, arg, (isOut) => {
         if (isOut) {
-          alignRightEnd(el, container);
+          alignRightEnd(el, container, modifiers);
         }
       });
       break;
     case modifiers.right:
     case TOOLTIP_PLACEMENTS.RIGHT:
-      alignRight(el, container);
-      isOutOfBounds(container, arg, modifiers, (isOut) => {
+      alignRight(el, container, modifiers);
+      isOutOfBounds(container, arg, (isOut) => {
         if (isOut) {
-          alignLeft(el, container);
+          alignLeft(el, container, modifiers);
         }
       });
       break;
     case modifiers.rightStart:
     case TOOLTIP_PLACEMENTS.RIGHT_START:
-      alignRightStart(el, container);
-      isOutOfBounds(container, arg, modifiers, (isOut) => {
+      alignRightStart(el, container, modifiers);
+      isOutOfBounds(container, arg, (isOut) => {
         if (isOut) {
-          alignLeftStart(el, container);
+          alignLeftStart(el, container, modifiers);
         }
       });
       break;
     case modifiers.rightEnd:
     case TOOLTIP_PLACEMENTS.RIGHT_END:
-      alignRightEnd(el, container);
-      isOutOfBounds(container, arg, modifiers, (isOut) => {
+      alignRightEnd(el, container, modifiers);
+      isOutOfBounds(container, arg, (isOut) => {
         if (isOut) {
-          alignLeftEnd(el, container);
+          alignLeftEnd(el, container, modifiers);
         }
       });
       break;
     case modifiers.bottom:
     case TOOLTIP_PLACEMENTS.BOTTOM:
-      alignBottom(el, container);
-      isOutOfBounds(container, arg, modifiers, (isOut) => {
+      alignBottom(el, container, modifiers);
+      isOutOfBounds(container, arg, (isOut) => {
         if (isOut) {
-          alignTop(el, container);
+          alignTop(el, container, modifiers);
         }
       });
       break;
     case modifiers.bottomStart:
     case TOOLTIP_PLACEMENTS.BOTTOM_START:
-      alignBottomStart(el, container);
-      isOutOfBounds(container, arg, modifiers, (isOut) => {
+      alignBottomStart(el, container, modifiers);
+      isOutOfBounds(container, arg, (isOut) => {
         if (isOut) {
-          alignTopStart(el, container);
+          alignTopStart(el, container, modifiers);
         }
       });
       break;
     case modifiers.bottomEnd:
     case TOOLTIP_PLACEMENTS.BOTTOM_END:
-      alignBottomEnd(el, container);
-      isOutOfBounds(container, arg, modifiers, (isOut) => {
+      alignBottomEnd(el, container, modifiers);
+      isOutOfBounds(container, arg, (isOut) => {
         if (isOut) {
-          alignTopEnd(el, container);
+          alignTopEnd(el, container, modifiers);
         }
       });
       break;
     case modifiers.topStart:
     case TOOLTIP_PLACEMENTS.TOP_START:
-      alignTopStart(el, container);
-      isOutOfBounds(container, arg, modifiers, (isOut) => {
+      alignTopStart(el, container, modifiers);
+      isOutOfBounds(container, arg, (isOut) => {
         if (isOut) {
-          alignBottomStart(el, container);
+          alignBottomStart(el, container, modifiers);
         }
       });
       break;
     case modifiers.topEnd:
     case TOOLTIP_PLACEMENTS.TOP_END:
-      alignTopEnd(el, container);
-      isOutOfBounds(container, arg, modifiers, (isOut) => {
+      alignTopEnd(el, container, modifiers);
+      isOutOfBounds(container, arg, (isOut) => {
         if (isOut) {
-          alignBottomEnd(el, container);
+          alignBottomEnd(el, container, modifiers);
         }
       });
       break;
     case TOOLTIP_PLACEMENTS.TOP:
-      alignTop(el, container);
-      isOutOfBounds(container, arg, modifiers, (isOut) => {
+      alignTop(el, container, modifiers);
+      isOutOfBounds(container, arg, (isOut) => {
         if (isOut) {
-          alignBottom(el, container);
+          alignBottom(el, container, modifiers);
         }
       });
       break;
     default:
-      alignTop(el, container);
-      isOutOfBounds(container, arg, modifiers, (isOut) => {
+      alignTop(el, container, modifiers);
+      isOutOfBounds(container, arg, (isOut) => {
         if (isOut) {
-          alignBottom(el, container);
+          alignBottom(el, container, modifiers);
         }
       });
   }
@@ -305,7 +304,7 @@ function handleMouseEnter(el: HTMLElement, container: HTMLDivElement, binding: D
   const isFilePresent =
     binding.value && (binding.value.__file || (binding.value.content && binding.value.content.__file));
 
-  if (((isValueMissing || isContentMissing) && !isFilePresent) || binding.value?.disabled) {
+  if ((isValueMissing || isContentMissing) && !isFilePresent) {
     clearTooltip(binding, container);
     return;
   }
@@ -313,10 +312,19 @@ function handleMouseEnter(el: HTMLElement, container: HTMLDivElement, binding: D
   if (hideTimeout) {
     clearTimeout(hideTimeout);
     hideTimeout = null;
+    if (arrow && document.body.contains(arrow)) {
+      document.body.removeChild(arrow);
+      arrow = null;
+    }
   }
 
   container.style.setProperty(TOOLTIP.DISPLAY, 'block');
   document.body.appendChild(container);
+
+  arrow = document.createElement('div');
+  arrow.className = 'tooltip-arrow';
+  document.body.appendChild(arrow);
+
   updateTooltip(el, binding, container);
 
   wheelEventHandler = () => handleMouseLeave(el, container, binding);
@@ -368,158 +376,238 @@ function clearTooltip({ modifiers, value, arg }: DirectiveBinding, container: HT
     document.body.removeChild(container);
   }
 
+  if (arrow && document.body.contains(arrow)) {
+    document.body.removeChild(arrow);
+    arrow = null;
+  }
+
   if (arg) {
     arg = undefined;
   }
-}
-
-function setArrowPlacement(placement: Placement) {
-  const arrow = document.querySelector('.tooltip-arrow');
-
-  if (!arrow) return;
-
-  Object.values(TOOLTIP_PLACEMENTS).forEach((dir) => {
-    arrow.classList.remove(`${dir}-arrow`);
-  });
-
-  arrow.classList.add(`${placement}-arrow`);
 }
 
 function getElRect(el: HTMLElement) {
   return el.getBoundingClientRect();
 }
 
-function setContainerPlacement(container: HTMLDivElement, left: number, top: number) {
+function setPosition(container: HTMLElement, left: number, top: number) {
   container.style.left = `${left}px`;
   container.style.top = `${top}px`;
 }
 
-function alignTop(el: HTMLElement, container: HTMLDivElement) {
+function setArrowTopPosition(el: HTMLElement, arrow: HTMLElement, modifiers: DirectiveBinding['modifiers']) {
+  const elRect = getElRect(el);
+
+  arrow.style.setProperty(TOOLTIP.ARROW_BORDER_COLOR, '#101828 transparent transparent transparent');
+
+  if (modifiers.bgLight) {
+    arrow.style.setProperty(TOOLTIP.ARROW_BORDER_COLOR, 'white transparent transparent transparent');
+  }
+
+  const arrowLeft = elRect.left + elRect.width / 2 - arrow.offsetWidth / 2;
+  const arrowTop = elRect.top - arrow.offsetHeight;
+  setPosition(arrow, arrowLeft, arrowTop);
+}
+
+function setArrowBottomPosition(el: HTMLElement, arrow: HTMLElement, modifiers: DirectiveBinding['modifiers']) {
+  const elRect = getElRect(el);
+
+  arrow.style.setProperty(TOOLTIP.ARROW_BORDER_COLOR, 'transparent transparent #101828 transparent');
+
+  if (modifiers.bgLight) {
+    arrow.style.setProperty(TOOLTIP.ARROW_BORDER_COLOR, 'transparent transparent white transparent');
+  }
+
+  const arrowLeft = elRect.left + elRect.width / 2 - arrow.offsetWidth / 2;
+  const arrowTop = elRect.bottom;
+  setPosition(arrow, arrowLeft, arrowTop);
+}
+
+function setArrowLeftPosition(el: HTMLElement, arrow: HTMLElement, modifiers: DirectiveBinding['modifiers']) {
+  const elRect = getElRect(el);
+
+  arrow.style.setProperty(TOOLTIP.ARROW_BORDER_COLOR, 'transparent transparent transparent #101828');
+
+  if (modifiers.bgLight) {
+    arrow.style.setProperty(TOOLTIP.ARROW_BORDER_COLOR, 'transparent transparent transparent white');
+  }
+
+  const arrowLeft = elRect.left - arrow.offsetWidth;
+  const arrowTop = elRect.top + elRect.height / 2 - arrow.offsetHeight / 2;
+  setPosition(arrow, arrowLeft, arrowTop);
+}
+
+function setArrowRightPosition(el: HTMLElement, arrow: HTMLElement, modifiers: DirectiveBinding['modifiers']) {
+  const elRect = getElRect(el);
+
+  arrow.style.setProperty(TOOLTIP.ARROW_BORDER_COLOR, 'transparent #101828 transparent transparent');
+
+  if (modifiers.bgLight) {
+    arrow.style.setProperty(TOOLTIP.ARROW_BORDER_COLOR, 'transparent white transparent transparent');
+  }
+
+  const arrowLeft = elRect.right;
+  const arrowTop = elRect.top + elRect.height / 2 - arrow.offsetHeight / 2;
+  setPosition(arrow, arrowLeft, arrowTop);
+}
+
+function alignTop(el: HTMLElement, container: HTMLDivElement, modifiers: DirectiveBinding['modifiers']) {
   const elRect = getElRect(el);
 
   const left = elRect.left + (elRect.width - container.offsetWidth) / 2;
   const top = elRect.top - container.offsetHeight - 12;
 
-  setContainerPlacement(container, left, top);
-  setArrowPlacement(TOOLTIP_PLACEMENTS.TOP);
+  setPosition(container, left, top);
+
+  if (arrow) {
+    setArrowTopPosition(el, arrow, modifiers);
+  }
 }
 
-function alignTopStart(el: HTMLElement, container: HTMLDivElement) {
+function alignTopStart(el: HTMLElement, container: HTMLDivElement, modifiers: DirectiveBinding['modifiers']) {
   const elRect = getElRect(el);
 
   const left = elRect.left;
   const top = elRect.top - container.offsetHeight - 12;
 
-  setContainerPlacement(container, left, top);
-  setArrowPlacement(TOOLTIP_PLACEMENTS.TOP_START);
+  setPosition(container, left, top);
+
+  if (arrow) {
+    setArrowTopPosition(el, arrow, modifiers);
+  }
 }
 
-function alignTopEnd(el: HTMLElement, container: HTMLDivElement) {
+function alignTopEnd(el: HTMLElement, container: HTMLDivElement, modifiers: DirectiveBinding['modifiers']) {
   const elRect = getElRect(el);
 
   const left = elRect.right - container.offsetWidth;
   const top = elRect.top - container.offsetHeight - 12;
 
-  setContainerPlacement(container, left, top);
-  setArrowPlacement(TOOLTIP_PLACEMENTS.TOP_END);
+  setPosition(container, left, top);
+
+  if (arrow) {
+    setArrowTopPosition(el, arrow, modifiers);
+  }
 }
 
-function alignBottom(el: HTMLElement, container: HTMLDivElement) {
+function alignBottom(el: HTMLElement, container: HTMLDivElement, modifiers: DirectiveBinding['modifiers']) {
   const elRect = getElRect(el);
 
   const left = elRect.left + (elRect.width - container.offsetWidth) / 2;
   const top = elRect.bottom + 12;
 
-  setContainerPlacement(container, left, top);
-  setArrowPlacement(TOOLTIP_PLACEMENTS.BOTTOM);
+  setPosition(container, left, top);
+
+  if (arrow) {
+    setArrowBottomPosition(el, arrow, modifiers);
+  }
 }
 
-function alignBottomStart(el: HTMLElement, container: HTMLDivElement) {
+function alignBottomStart(el: HTMLElement, container: HTMLDivElement, modifiers: DirectiveBinding['modifiers']) {
   const elRect = getElRect(el);
 
   const left = elRect.left;
   const top = elRect.bottom + 12;
 
-  setContainerPlacement(container, left, top);
-  setArrowPlacement(TOOLTIP_PLACEMENTS.BOTTOM_START);
+  setPosition(container, left, top);
+
+  if (arrow) {
+    setArrowBottomPosition(el, arrow, modifiers);
+  }
 }
 
-function alignBottomEnd(el: HTMLElement, container: HTMLDivElement) {
+function alignBottomEnd(el: HTMLElement, container: HTMLDivElement, modifiers: DirectiveBinding['modifiers']) {
   const elRect = getElRect(el);
 
   const left = elRect.right - container.offsetWidth;
   const top = elRect.bottom + 12;
 
-  setContainerPlacement(container, left, top);
-  setArrowPlacement(TOOLTIP_PLACEMENTS.BOTTOM_END);
+  setPosition(container, left, top);
+
+  if (arrow) {
+    setArrowBottomPosition(el, arrow, modifiers);
+  }
 }
 
-function alignLeft(el: HTMLElement, container: HTMLDivElement) {
+function alignLeft(el: HTMLElement, container: HTMLDivElement, modifiers: DirectiveBinding['modifiers']) {
   const elRect = getElRect(el);
 
   const left = elRect.left - container.offsetWidth - 12;
   const top = elRect.top + (elRect.height - container.offsetHeight) / 2;
 
-  setContainerPlacement(container, left, top);
-  setArrowPlacement(TOOLTIP_PLACEMENTS.LEFT);
+  setPosition(container, left, top);
+
+  if (arrow) {
+    setArrowLeftPosition(el, arrow, modifiers);
+  }
 }
 
-function alignLeftStart(el: HTMLElement, container: HTMLDivElement) {
+function alignLeftStart(el: HTMLElement, container: HTMLDivElement, modifiers: DirectiveBinding['modifiers']) {
   const elRect = getElRect(el);
 
   const left = elRect.left - container.offsetWidth - 12;
   const top = elRect.top;
 
-  setContainerPlacement(container, left, top);
-  setArrowPlacement(TOOLTIP_PLACEMENTS.LEFT_START);
+  setPosition(container, left, top);
+
+  if (arrow) {
+    setArrowLeftPosition(el, arrow, modifiers);
+  }
 }
 
-function alignLeftEnd(el: HTMLElement, container: HTMLDivElement) {
+function alignLeftEnd(el: HTMLElement, container: HTMLDivElement, modifiers: DirectiveBinding['modifiers']) {
   const elRect = getElRect(el);
 
   const left = elRect.left - container.offsetWidth - 12;
   const top = elRect.bottom - container.offsetHeight;
 
-  setContainerPlacement(container, left, top);
-  setArrowPlacement(TOOLTIP_PLACEMENTS.LEFT_END);
+  setPosition(container, left, top);
+
+  if (arrow) {
+    setArrowLeftPosition(el, arrow, modifiers);
+  }
 }
 
-function alignRight(el: HTMLElement, container: HTMLDivElement) {
+function alignRight(el: HTMLElement, container: HTMLDivElement, modifiers: DirectiveBinding['modifiers']) {
   const elRect = getElRect(el);
 
   const left = elRect.right + 12;
   const top = elRect.top + (elRect.height - container.offsetHeight) / 2;
 
-  setContainerPlacement(container, left, top);
-  setArrowPlacement(TOOLTIP_PLACEMENTS.RIGHT);
+  setPosition(container, left, top);
+
+  if (arrow) {
+    setArrowRightPosition(el, arrow, modifiers);
+  }
 }
 
-function alignRightStart(el: HTMLElement, container: HTMLDivElement) {
+function alignRightStart(el: HTMLElement, container: HTMLDivElement, modifiers: DirectiveBinding['modifiers']) {
   const elRect = getElRect(el);
 
   const left = elRect.right + 12;
   const top = elRect.top;
 
-  setContainerPlacement(container, left, top);
-  setArrowPlacement(TOOLTIP_PLACEMENTS.RIGHT_START);
+  setPosition(container, left, top);
+
+  if (arrow) {
+    setArrowRightPosition(el, arrow, modifiers);
+  }
 }
 
-function alignRightEnd(el: HTMLElement, container: HTMLDivElement) {
+function alignRightEnd(el: HTMLElement, container: HTMLDivElement, modifiers: DirectiveBinding['modifiers']) {
   const elRect = getElRect(el);
 
   const left = elRect.right + 12;
   const top = elRect.bottom - container.offsetHeight;
 
-  setContainerPlacement(container, left, top);
-  setArrowPlacement(TOOLTIP_PLACEMENTS.RIGHT_END);
+  setPosition(container, left, top);
+
+  if (arrow) {
+    setArrowRightPosition(el, arrow, modifiers);
+  }
 }
 
-function isOutOfBounds(
-  container: HTMLDivElement,
-  arg: DirectiveBinding['arg'],
-  modifiers: DirectiveBinding['modifiers'],
-  cb: (isOut: boolean) => void,
-) {
+function isOutOfBounds(container: HTMLDivElement, arg: DirectiveBinding['arg'], cb: (isOut: boolean) => void) {
   const observerEl = document.querySelector(`.${typeof arg === 'string' ? arg : null}`);
   const containerRect = container.getBoundingClientRect();
 
@@ -548,4 +636,30 @@ function isOutOfBounds(
       containerRect.top < 0 ||
       containerRect.top + height > viewportHeight,
   );
+}
+
+function loadDynamicComponent(value: any, container: HTMLDivElement) {
+  const tooltipFiles = import.meta.glob('../tooltip/*.vue');
+  const contentsFiles = import.meta.glob('../contents/*.md');
+
+  const filePath = value.__file || value.content.__file;
+  const extractedName = filePath
+    .split('/')
+    .pop()
+    ?.replace(/\.(vue|md)$/, '');
+  const tooltipPath = Object.keys(tooltipFiles).find((key) => key.includes(extractedName));
+  const contextPath = Object.keys(contentsFiles).find((key) => key.includes(extractedName));
+
+  const tooltipFileName = tooltipPath ? tooltipPath.split('/').pop()?.replace('.vue', '') : undefined;
+  const contentsFileName = contextPath ? contextPath.split('/').pop()?.replace('.md', '') : undefined;
+
+  let component: any;
+  console.log('tooltipFileName', tooltipFileName);
+  if (tooltipFileName) {
+    component = defineAsyncComponent(() => import(`../tooltip/${tooltipFileName}.vue`));
+  } else if (contentsFileName) {
+    component = defineAsyncComponent(() => import(`../contents/${contentsFileName}.md`));
+  }
+
+  render(h(component), container);
 }
