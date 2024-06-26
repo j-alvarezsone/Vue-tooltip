@@ -13,6 +13,7 @@
     "vue": "^3.4.30"
   },
   "devDependencies": {
+    "@rollup/plugin-dynamic-import-vars": "^2.1.2",
     "@rushstack/eslint-patch": "^1.10.3",
     "@tsconfig/node18": "^18.2.4",
     "@types/node": "18",
