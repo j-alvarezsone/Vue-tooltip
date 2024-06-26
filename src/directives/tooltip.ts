@@ -1,4 +1,4 @@
-import { type Directive, type DirectiveBinding, render, h, defineAsyncComponent, type Component } from 'vue';
+import { type Directive, type DirectiveBinding, render, h, defineAsyncComponent } from 'vue';
 
 type ObjectValues<T> = T[keyof T];
 
