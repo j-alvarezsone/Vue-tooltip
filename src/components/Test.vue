@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-  // import Modifiers from './Modifiers.vue';
+  import Modifiers from './Modifiers.vue';
   import ObjectPlacement from './ObjectPlacement.vue';
 </script>
 
 <template>
-  <!-- <Modifiers />
-  <br /> -->
+  <Modifiers />
+  <br />
   <ObjectPlacement />
   <br />
 </template>

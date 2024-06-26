@@ -1,7 +1,7 @@
 <template>
-  <h1>Object Placement</h1>
+  <h1 class="text-red-500">Object Placement</h1>
   <br />
-  <div class="container">
+  <div class="_container">
     <div class="placement">
       <p v-tooltip="{ content: 'Top', placement: 'top' }">Top</p>
       <p v-tooltip="{ content: 'Top Start', placement: 'topStart' }">Top Start</p>
@@ -48,7 +48,7 @@
     text-align: center;
   }
 
-  .container {
+  ._container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);

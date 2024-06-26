@@ -1,7 +1,7 @@
 <template>
   <h1>Modifiers</h1>
   <br />
-  <div class="container">
+  <div class="_container">
     <div class="placement">
       <p v-tooltip="'Top'">Top</p>
       <p v-tooltip.topStart="'Top Start'">Top Start</p>
@@ -43,7 +43,7 @@
     text-align: center;
   }
 
-  .container {
+  ._container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);

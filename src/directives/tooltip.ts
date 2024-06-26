@@ -1,4 +1,4 @@
-import { type Directive, type DirectiveBinding, render, h, type App, createApp } from 'vue';
+import { type Directive, type DirectiveBinding, render, h, nextTick, type VNode } from 'vue';
 
 type ObjectValues<T> = T[keyof T];
 
@@ -37,11 +37,9 @@ type Placement = ObjectValues<typeof TOOLTIP_PLACEMENTS>;
 
 const tooltipContainer = document.createElement('div');
 let observer: IntersectionObserver | null = null;
-let mutationObserver: MutationObserver | null = null;
 let hideTimeout: number | null = null;
 let wheelEventHandler: (() => void) | null = null;
 let arrow: HTMLElement | null = null;
-let app: App<Element> | null = null;
 
 export const tooltip: Directive = {
   beforeMount(el: HTMLElement, binding: DirectiveBinding) {
@@ -69,11 +67,6 @@ export const tooltip: Directive = {
       observer.disconnect();
       observer = null;
     }
-
-    if (mutationObserver) {
-      mutationObserver.disconnect();
-      mutationObserver = null;
-    }
   },
 };
 
@@ -92,17 +85,25 @@ function updateTooltip(el: HTMLElement, { value, modifiers, arg }: DirectiveBind
   } else if (typeof value === 'object') {
     if (value.__file || (value.content && value.content.__file)) {
       isComponent = true;
-      loadDynamicComponent(value, container);
 
-      mutationObserver = new MutationObserver(() => {
+      const vNodes = value.content ? value.content.render() : value.render();
+      const vNodesArray = vNodes.children.map((vNode: VNode) => {
+        const { type, props, children } = vNode;
+
+        return h(type as string, { class: props?.class, innerHTML: children });
+      });
+
+      const parentVNode = h(vNodes.type, { class: vNodes.props?.class }, vNodesArray);
+
+      render(parentVNode, container);
+
+      nextTick(() => {
         setPlacement(el, container, modifiers, arg, value, value.placement);
       });
 
       if (value?.maxWidth) {
         container.style.setProperty(TOOLTIP.MAX_WIDTH, value.maxWidth);
       }
-
-      mutationObserver.observe(container, { childList: true, subtree: true });
     } else {
       applyObjectTooltipStyles(value, container);
     }
@@ -293,11 +294,6 @@ function removeTooltip(container: HTMLDivElement, binding: DirectiveBinding, obs
     observer.disconnect();
     observer = null;
   }
-
-  if (mutationObserver) {
-    mutationObserver.disconnect();
-    mutationObserver = null;
-  }
 }
 
 function handleMouseEnter(el: HTMLElement, container: HTMLDivElement, binding: DirectiveBinding) {
@@ -387,9 +383,7 @@ function clearTooltip({ modifiers, value, arg }: DirectiveBinding, container: HT
     arg = undefined;
   }
 
-  if (app !== null) {
-    app.unmount();
-  }
+  render(null, tooltipContainer);
 }
 
 function getElRect(el: HTMLElement) {
@@ -722,33 +716,4 @@ function isOutOfBounds(container: HTMLDivElement, arg: DirectiveBinding['arg'], 
       containerRect.top < 0 ||
       containerRect.top + height > viewportHeight,
   );
-}
-
-function loadDynamicComponent(value: any, container: HTMLElement) {
-  // Determine the component path
-  const componentPath = value.__file || (value.content && value.content.__file);
-  const extractedPath = componentPath
-    .split('/')
-    .pop()
-    ?.replace(/\.(vue|md)$/, '');
-
-  console.log('componentPath', extractedPath);
-  import(`../tooltip/${extractedPath}.vue`)
-    .then((module) => {
-      const Component = module.default;
-      if (app !== null) {
-        app.unmount();
-      }
-
-      app = createApp({
-        render() {
-          return h(Component);
-        },
-      });
-
-      app.mount(container);
-    })
-    .catch((error) => {
-      console.error('Failed to load dynamic component:', error);
-    });
 }
