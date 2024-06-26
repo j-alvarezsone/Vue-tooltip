@@ -94,7 +94,7 @@ function updateTooltip(el: HTMLElement, { value, modifiers, arg }: DirectiveBind
       loadDynamicComponent(value, container);
 
       mutationObserver = new MutationObserver(() => {
-        setPlacement(el, container, modifiers, arg, value.placement);
+        setPlacement(el, container, modifiers, arg, value, value.placement);
       });
 
       if (value?.maxWidth) {
@@ -110,7 +110,7 @@ function updateTooltip(el: HTMLElement, { value, modifiers, arg }: DirectiveBind
   container.classList.add('tooltip');
 
   if (!isComponent) {
-    setPlacement(el, container, modifiers, arg, value.placement);
+    setPlacement(el, container, modifiers, arg, value, value.placement);
   }
 
   if (modifiers.bgLight || value?.bgLight) {
@@ -160,121 +160,122 @@ function setPlacement(
   container: HTMLDivElement,
   modifiers: DirectiveBinding['modifiers'],
   arg: DirectiveBinding['arg'],
+  value: DirectiveBinding['value'],
   position: Placement | undefined,
 ) {
   switch (position || true) {
     case modifiers.left:
     case TOOLTIP_PLACEMENTS.LEFT:
-      alignLeft(el, container, modifiers);
+      alignLeft(el, container, modifiers, value);
       isOutOfBounds(container, arg, (isOut) => {
         if (isOut) {
-          alignRight(el, container, modifiers);
+          alignRight(el, container, modifiers, value);
         }
       });
       break;
     case modifiers.leftStart:
     case TOOLTIP_PLACEMENTS.LEFT_START:
-      alignLeftStart(el, container, modifiers);
+      alignLeftStart(el, container, modifiers, value);
       isOutOfBounds(container, arg, (isOut) => {
         if (isOut) {
-          alignRightStart(el, container, modifiers);
+          alignRightStart(el, container, modifiers, value);
         }
       });
       break;
     case modifiers.leftEnd:
     case TOOLTIP_PLACEMENTS.LEFT_END:
-      alignLeftEnd(el, container, modifiers);
+      alignLeftEnd(el, container, modifiers, value);
       isOutOfBounds(container, arg, (isOut) => {
         if (isOut) {
-          alignRightEnd(el, container, modifiers);
+          alignRightEnd(el, container, modifiers, value);
         }
       });
       break;
     case modifiers.right:
     case TOOLTIP_PLACEMENTS.RIGHT:
-      alignRight(el, container, modifiers);
+      alignRight(el, container, modifiers, value);
       isOutOfBounds(container, arg, (isOut) => {
         if (isOut) {
-          alignLeft(el, container, modifiers);
+          alignLeft(el, container, modifiers, value);
         }
       });
       break;
     case modifiers.rightStart:
     case TOOLTIP_PLACEMENTS.RIGHT_START:
-      alignRightStart(el, container, modifiers);
+      alignRightStart(el, container, modifiers, value);
       isOutOfBounds(container, arg, (isOut) => {
         if (isOut) {
-          alignLeftStart(el, container, modifiers);
+          alignLeftStart(el, container, modifiers, value);
         }
       });
       break;
     case modifiers.rightEnd:
     case TOOLTIP_PLACEMENTS.RIGHT_END:
-      alignRightEnd(el, container, modifiers);
+      alignRightEnd(el, container, modifiers, value);
       isOutOfBounds(container, arg, (isOut) => {
         if (isOut) {
-          alignLeftEnd(el, container, modifiers);
+          alignLeftEnd(el, container, modifiers, value);
         }
       });
       break;
     case modifiers.bottom:
     case TOOLTIP_PLACEMENTS.BOTTOM:
-      alignBottom(el, container, modifiers);
+      alignBottom(el, container, modifiers, value);
       isOutOfBounds(container, arg, (isOut) => {
         if (isOut) {
-          alignTop(el, container, modifiers);
+          alignTop(el, container, modifiers, value);
         }
       });
       break;
     case modifiers.bottomStart:
     case TOOLTIP_PLACEMENTS.BOTTOM_START:
-      alignBottomStart(el, container, modifiers);
+      alignBottomStart(el, container, modifiers, value);
       isOutOfBounds(container, arg, (isOut) => {
         if (isOut) {
-          alignTopStart(el, container, modifiers);
+          alignTopStart(el, container, modifiers, value);
         }
       });
       break;
     case modifiers.bottomEnd:
     case TOOLTIP_PLACEMENTS.BOTTOM_END:
-      alignBottomEnd(el, container, modifiers);
+      alignBottomEnd(el, container, modifiers, value);
       isOutOfBounds(container, arg, (isOut) => {
         if (isOut) {
-          alignTopEnd(el, container, modifiers);
+          alignTopEnd(el, container, modifiers, value);
         }
       });
       break;
     case modifiers.topStart:
     case TOOLTIP_PLACEMENTS.TOP_START:
-      alignTopStart(el, container, modifiers);
+      alignTopStart(el, container, modifiers, value);
       isOutOfBounds(container, arg, (isOut) => {
         if (isOut) {
-          alignBottomStart(el, container, modifiers);
+          alignBottomStart(el, container, modifiers, value);
         }
       });
       break;
     case modifiers.topEnd:
     case TOOLTIP_PLACEMENTS.TOP_END:
-      alignTopEnd(el, container, modifiers);
+      alignTopEnd(el, container, modifiers, value);
       isOutOfBounds(container, arg, (isOut) => {
         if (isOut) {
-          alignBottomEnd(el, container, modifiers);
+          alignBottomEnd(el, container, modifiers, value);
         }
       });
       break;
     case TOOLTIP_PLACEMENTS.TOP:
-      alignTop(el, container, modifiers);
+      alignTop(el, container, modifiers, value);
       isOutOfBounds(container, arg, (isOut) => {
         if (isOut) {
-          alignBottom(el, container, modifiers);
+          alignBottom(el, container, modifiers, value);
         }
       });
       break;
     default:
-      alignTop(el, container, modifiers);
+      alignTop(el, container, modifiers, value);
       isOutOfBounds(container, arg, (isOut) => {
         if (isOut) {
-          alignBottom(el, container, modifiers);
+          alignBottom(el, container, modifiers, value);
         }
       });
   }
@@ -395,12 +396,17 @@ function setPosition(container: HTMLElement, left: number, top: number) {
   container.style.top = `${top}px`;
 }
 
-function setArrowTopPosition(el: HTMLElement, arrow: HTMLElement, modifiers: DirectiveBinding['modifiers']) {
+function setArrowTopPosition(
+  el: HTMLElement,
+  arrow: HTMLElement,
+  modifiers: DirectiveBinding['modifiers'],
+  value: DirectiveBinding['value'],
+) {
   const elRect = getElRect(el);
 
   arrow.style.setProperty(TOOLTIP.ARROW_BORDER_COLOR, '#101828 transparent transparent transparent');
 
-  if (modifiers.bgLight) {
+  if (modifiers.bgLight || value?.bgLight) {
     arrow.style.setProperty(TOOLTIP.ARROW_BORDER_COLOR, 'white transparent transparent transparent');
   }
 
@@ -409,12 +415,17 @@ function setArrowTopPosition(el: HTMLElement, arrow: HTMLElement, modifiers: Dir
   setPosition(arrow, arrowLeft, arrowTop);
 }
 
-function setArrowBottomPosition(el: HTMLElement, arrow: HTMLElement, modifiers: DirectiveBinding['modifiers']) {
+function setArrowBottomPosition(
+  el: HTMLElement,
+  arrow: HTMLElement,
+  modifiers: DirectiveBinding['modifiers'],
+  value: DirectiveBinding['value'],
+) {
   const elRect = getElRect(el);
 
   arrow.style.setProperty(TOOLTIP.ARROW_BORDER_COLOR, 'transparent transparent #101828 transparent');
 
-  if (modifiers.bgLight) {
+  if (modifiers.bgLight || value?.bgLight) {
     arrow.style.setProperty(TOOLTIP.ARROW_BORDER_COLOR, 'transparent transparent white transparent');
   }
 
@@ -423,12 +434,17 @@ function setArrowBottomPosition(el: HTMLElement, arrow: HTMLElement, modifiers: 
   setPosition(arrow, arrowLeft, arrowTop);
 }
 
-function setArrowLeftPosition(el: HTMLElement, arrow: HTMLElement, modifiers: DirectiveBinding['modifiers']) {
+function setArrowLeftPosition(
+  el: HTMLElement,
+  arrow: HTMLElement,
+  modifiers: DirectiveBinding['modifiers'],
+  value: DirectiveBinding['value'],
+) {
   const elRect = getElRect(el);
 
   arrow.style.setProperty(TOOLTIP.ARROW_BORDER_COLOR, 'transparent transparent transparent #101828');
 
-  if (modifiers.bgLight) {
+  if (modifiers.bgLight || value?.bgLight) {
     arrow.style.setProperty(TOOLTIP.ARROW_BORDER_COLOR, 'transparent transparent transparent white');
   }
 
@@ -437,12 +453,17 @@ function setArrowLeftPosition(el: HTMLElement, arrow: HTMLElement, modifiers: Di
   setPosition(arrow, arrowLeft, arrowTop);
 }
 
-function setArrowRightPosition(el: HTMLElement, arrow: HTMLElement, modifiers: DirectiveBinding['modifiers']) {
+function setArrowRightPosition(
+  el: HTMLElement,
+  arrow: HTMLElement,
+  modifiers: DirectiveBinding['modifiers'],
+  value: DirectiveBinding['value'],
+) {
   const elRect = getElRect(el);
 
   arrow.style.setProperty(TOOLTIP.ARROW_BORDER_COLOR, 'transparent #101828 transparent transparent');
 
-  if (modifiers.bgLight) {
+  if (modifiers.bgLight || value?.bgLight) {
     arrow.style.setProperty(TOOLTIP.ARROW_BORDER_COLOR, 'transparent white transparent transparent');
   }
 
@@ -451,7 +472,12 @@ function setArrowRightPosition(el: HTMLElement, arrow: HTMLElement, modifiers: D
   setPosition(arrow, arrowLeft, arrowTop);
 }
 
-function alignTop(el: HTMLElement, container: HTMLDivElement, modifiers: DirectiveBinding['modifiers']) {
+function alignTop(
+  el: HTMLElement,
+  container: HTMLDivElement,
+  modifiers: DirectiveBinding['modifiers'],
+  value: DirectiveBinding['value'],
+) {
   const elRect = getElRect(el);
 
   const left = elRect.left + (elRect.width - container.offsetWidth) / 2;
@@ -460,11 +486,16 @@ function alignTop(el: HTMLElement, container: HTMLDivElement, modifiers: Directi
   setPosition(container, left, top);
 
   if (arrow) {
-    setArrowTopPosition(el, arrow, modifiers);
+    setArrowTopPosition(el, arrow, modifiers, value);
   }
 }
 
-function alignTopStart(el: HTMLElement, container: HTMLDivElement, modifiers: DirectiveBinding['modifiers']) {
+function alignTopStart(
+  el: HTMLElement,
+  container: HTMLDivElement,
+  modifiers: DirectiveBinding['modifiers'],
+  value: DirectiveBinding['value'],
+) {
   const elRect = getElRect(el);
 
   const left = elRect.left;
@@ -473,11 +504,16 @@ function alignTopStart(el: HTMLElement, container: HTMLDivElement, modifiers: Di
   setPosition(container, left, top);
 
   if (arrow) {
-    setArrowTopPosition(el, arrow, modifiers);
+    setArrowTopPosition(el, arrow, modifiers, value);
   }
 }
 
-function alignTopEnd(el: HTMLElement, container: HTMLDivElement, modifiers: DirectiveBinding['modifiers']) {
+function alignTopEnd(
+  el: HTMLElement,
+  container: HTMLDivElement,
+  modifiers: DirectiveBinding['modifiers'],
+  value: DirectiveBinding['value'],
+) {
   const elRect = getElRect(el);
 
   const left = elRect.right - container.offsetWidth;
@@ -486,11 +522,16 @@ function alignTopEnd(el: HTMLElement, container: HTMLDivElement, modifiers: Dire
   setPosition(container, left, top);
 
   if (arrow) {
-    setArrowTopPosition(el, arrow, modifiers);
+    setArrowTopPosition(el, arrow, modifiers, value);
   }
 }
 
-function alignBottom(el: HTMLElement, container: HTMLDivElement, modifiers: DirectiveBinding['modifiers']) {
+function alignBottom(
+  el: HTMLElement,
+  container: HTMLDivElement,
+  modifiers: DirectiveBinding['modifiers'],
+  value: DirectiveBinding['value'],
+) {
   const elRect = getElRect(el);
 
   const left = elRect.left + (elRect.width - container.offsetWidth) / 2;
@@ -499,11 +540,16 @@ function alignBottom(el: HTMLElement, container: HTMLDivElement, modifiers: Dire
   setPosition(container, left, top);
 
   if (arrow) {
-    setArrowBottomPosition(el, arrow, modifiers);
+    setArrowBottomPosition(el, arrow, modifiers, value);
   }
 }
 
-function alignBottomStart(el: HTMLElement, container: HTMLDivElement, modifiers: DirectiveBinding['modifiers']) {
+function alignBottomStart(
+  el: HTMLElement,
+  container: HTMLDivElement,
+  modifiers: DirectiveBinding['modifiers'],
+  value: DirectiveBinding['value'],
+) {
   const elRect = getElRect(el);
 
   const left = elRect.left;
@@ -512,11 +558,16 @@ function alignBottomStart(el: HTMLElement, container: HTMLDivElement, modifiers:
   setPosition(container, left, top);
 
   if (arrow) {
-    setArrowBottomPosition(el, arrow, modifiers);
+    setArrowBottomPosition(el, arrow, modifiers, value);
   }
 }
 
-function alignBottomEnd(el: HTMLElement, container: HTMLDivElement, modifiers: DirectiveBinding['modifiers']) {
+function alignBottomEnd(
+  el: HTMLElement,
+  container: HTMLDivElement,
+  modifiers: DirectiveBinding['modifiers'],
+  value: DirectiveBinding['value'],
+) {
   const elRect = getElRect(el);
 
   const left = elRect.right - container.offsetWidth;
@@ -525,11 +576,16 @@ function alignBottomEnd(el: HTMLElement, container: HTMLDivElement, modifiers: D
   setPosition(container, left, top);
 
   if (arrow) {
-    setArrowBottomPosition(el, arrow, modifiers);
+    setArrowBottomPosition(el, arrow, modifiers, value);
   }
 }
 
-function alignLeft(el: HTMLElement, container: HTMLDivElement, modifiers: DirectiveBinding['modifiers']) {
+function alignLeft(
+  el: HTMLElement,
+  container: HTMLDivElement,
+  modifiers: DirectiveBinding['modifiers'],
+  value: DirectiveBinding['value'],
+) {
   const elRect = getElRect(el);
 
   const left = elRect.left - container.offsetWidth - 12;
@@ -538,11 +594,16 @@ function alignLeft(el: HTMLElement, container: HTMLDivElement, modifiers: Direct
   setPosition(container, left, top);
 
   if (arrow) {
-    setArrowLeftPosition(el, arrow, modifiers);
+    setArrowLeftPosition(el, arrow, modifiers, value);
   }
 }
 
-function alignLeftStart(el: HTMLElement, container: HTMLDivElement, modifiers: DirectiveBinding['modifiers']) {
+function alignLeftStart(
+  el: HTMLElement,
+  container: HTMLDivElement,
+  modifiers: DirectiveBinding['modifiers'],
+  value: DirectiveBinding['value'],
+) {
   const elRect = getElRect(el);
 
   const left = elRect.left - container.offsetWidth - 12;
@@ -551,11 +612,16 @@ function alignLeftStart(el: HTMLElement, container: HTMLDivElement, modifiers: D
   setPosition(container, left, top);
 
   if (arrow) {
-    setArrowLeftPosition(el, arrow, modifiers);
+    setArrowLeftPosition(el, arrow, modifiers, value);
   }
 }
 
-function alignLeftEnd(el: HTMLElement, container: HTMLDivElement, modifiers: DirectiveBinding['modifiers']) {
+function alignLeftEnd(
+  el: HTMLElement,
+  container: HTMLDivElement,
+  modifiers: DirectiveBinding['modifiers'],
+  value: DirectiveBinding['value'],
+) {
   const elRect = getElRect(el);
 
   const left = elRect.left - container.offsetWidth - 12;
@@ -564,11 +630,16 @@ function alignLeftEnd(el: HTMLElement, container: HTMLDivElement, modifiers: Dir
   setPosition(container, left, top);
 
   if (arrow) {
-    setArrowLeftPosition(el, arrow, modifiers);
+    setArrowLeftPosition(el, arrow, modifiers, value);
   }
 }
 
-function alignRight(el: HTMLElement, container: HTMLDivElement, modifiers: DirectiveBinding['modifiers']) {
+function alignRight(
+  el: HTMLElement,
+  container: HTMLDivElement,
+  modifiers: DirectiveBinding['modifiers'],
+  value: DirectiveBinding['value'],
+) {
   const elRect = getElRect(el);
 
   const left = elRect.right + 12;
@@ -577,11 +648,16 @@ function alignRight(el: HTMLElement, container: HTMLDivElement, modifiers: Direc
   setPosition(container, left, top);
 
   if (arrow) {
-    setArrowRightPosition(el, arrow, modifiers);
+    setArrowRightPosition(el, arrow, modifiers, value);
   }
 }
 
-function alignRightStart(el: HTMLElement, container: HTMLDivElement, modifiers: DirectiveBinding['modifiers']) {
+function alignRightStart(
+  el: HTMLElement,
+  container: HTMLDivElement,
+  modifiers: DirectiveBinding['modifiers'],
+  value: DirectiveBinding['value'],
+) {
   const elRect = getElRect(el);
 
   const left = elRect.right + 12;
@@ -590,11 +666,16 @@ function alignRightStart(el: HTMLElement, container: HTMLDivElement, modifiers: 
   setPosition(container, left, top);
 
   if (arrow) {
-    setArrowRightPosition(el, arrow, modifiers);
+    setArrowRightPosition(el, arrow, modifiers, value);
   }
 }
 
-function alignRightEnd(el: HTMLElement, container: HTMLDivElement, modifiers: DirectiveBinding['modifiers']) {
+function alignRightEnd(
+  el: HTMLElement,
+  container: HTMLDivElement,
+  modifiers: DirectiveBinding['modifiers'],
+  value: DirectiveBinding['value'],
+) {
   const elRect = getElRect(el);
 
   const left = elRect.right + 12;
@@ -603,7 +684,7 @@ function alignRightEnd(el: HTMLElement, container: HTMLDivElement, modifiers: Di
   setPosition(container, left, top);
 
   if (arrow) {
-    setArrowRightPosition(el, arrow, modifiers);
+    setArrowRightPosition(el, arrow, modifiers, value);
   }
 }
 
