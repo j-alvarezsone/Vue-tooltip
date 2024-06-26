@@ -1,4 +1,4 @@
-import { type Directive, type DirectiveBinding, render, h, defineAsyncComponent } from 'vue';
+import { type Directive, type DirectiveBinding, render, h, defineAsyncComponent, type Component } from 'vue';
 
 type ObjectValues<T> = T[keyof T];
 
@@ -721,21 +721,22 @@ function isOutOfBounds(container: HTMLDivElement, arg: DirectiveBinding['arg'], 
 
 function loadDynamicComponent(value: any, container: HTMLDivElement) {
   const tooltipFiles = import.meta.glob('../tooltip/*.vue');
+  console.log('tooltipFiles', tooltipFiles);
 
   const filePath = value.__file || value.content.__file;
   const extractedName = filePath
     .split('/')
     .pop()
     ?.replace(/\.(vue|md)$/, '');
-  const tooltipPath = Object.keys(tooltipFiles).find((key) => key.includes(extractedName));
 
-  const tooltipFileName = tooltipPath ? tooltipPath.split('/').pop()?.replace('.vue', '') : undefined;
+  const tooltipComponentImport = Object.values(tooltipFiles).find((importFn) => {
+    const match = importFn.toString().match(/\/tooltip\/(.+?)\.vue/);
+    return match && match[1] === extractedName;
+  });
 
-  let component: any;
+  if (tooltipComponentImport) {
+    const component = defineAsyncComponent(() => tooltipComponentImport().then((c: any) => c.default as Component));
 
-  if (tooltipFileName) {
-    component = defineAsyncComponent(() => import(`../tooltip/${tooltipFileName}.vue`));
+    render(h(component), container);
   }
-
-  render(h(component), container);
 }
