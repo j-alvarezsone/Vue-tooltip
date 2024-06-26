@@ -1,4 +1,4 @@
-import { type Directive, type DirectiveBinding, render, h, defineAsyncComponent } from 'vue';
+import { type Directive, type DirectiveBinding, render, h, type App, createApp } from 'vue';
 
 type ObjectValues<T> = T[keyof T];
 
@@ -41,6 +41,7 @@ let mutationObserver: MutationObserver | null = null;
 let hideTimeout: number | null = null;
 let wheelEventHandler: (() => void) | null = null;
 let arrow: HTMLElement | null = null;
+let app: App<Element> | null = null;
 
 export const tooltip: Directive = {
   beforeMount(el: HTMLElement, binding: DirectiveBinding) {
@@ -385,6 +386,10 @@ function clearTooltip({ modifiers, value, arg }: DirectiveBinding, container: HT
   if (arg) {
     arg = undefined;
   }
+
+  if (app !== null) {
+    app.unmount();
+  }
 }
 
 function getElRect(el: HTMLElement) {
@@ -720,22 +725,17 @@ function isOutOfBounds(container: HTMLDivElement, arg: DirectiveBinding['arg'], 
 }
 
 function loadDynamicComponent(value: any, container: HTMLDivElement) {
-  const tooltipFiles = import.meta.glob('../tooltip/*.vue');
+  const componentPath = value.__file || value.content.__file;
 
-  const filePath = value.__file || value.content.__file;
-  const extractedName = filePath
-    .split('/')
-    .pop()
-    ?.replace(/\.(vue|md)$/, '');
-  const tooltipPath = Object.keys(tooltipFiles).find((key) => key.includes(extractedName));
+  import(componentPath).then((module) => {
+    const Component = module.default;
 
-  const tooltipFileName = tooltipPath ? tooltipPath.split('/').pop()?.replace('.vue', '') : undefined;
+    app = createApp({
+      render() {
+        return h(Component);
+      },
+    });
 
-  let component: any;
-
-  if (tooltipFileName) {
-    component = defineAsyncComponent(() => import(`../tooltip/${tooltipFileName}.vue`));
-  }
-
-  render(h(component), container);
+    app.mount(container);
+  });
 }
