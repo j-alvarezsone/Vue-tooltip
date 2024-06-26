@@ -727,9 +727,13 @@ function isOutOfBounds(container: HTMLDivElement, arg: DirectiveBinding['arg'], 
 function loadDynamicComponent(value: any, container: HTMLElement) {
   // Determine the component path
   const componentPath = value.__file || (value.content && value.content.__file);
+  const extractedPath = componentPath
+    .split('/')
+    .pop()
+    ?.replace(/\.(vue|md)$/, '');
 
-  console.log('componentPath', componentPath);
-  import(componentPath)
+  console.log('componentPath', extractedPath);
+  import(`../tooltip/${extractedPath}.vue`)
     .then((module) => {
       const Component = module.default;
       if (app !== null) {
