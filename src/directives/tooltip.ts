@@ -721,22 +721,21 @@ function isOutOfBounds(container: HTMLDivElement, arg: DirectiveBinding['arg'], 
 
 function loadDynamicComponent(value: any, container: HTMLDivElement) {
   const tooltipFiles = import.meta.glob('../tooltip/*.vue');
-  console.log('tooltipFiles', tooltipFiles);
 
   const filePath = value.__file || value.content.__file;
   const extractedName = filePath
     .split('/')
     .pop()
     ?.replace(/\.(vue|md)$/, '');
+  const tooltipPath = Object.keys(tooltipFiles).find((key) => key.includes(extractedName));
 
-  const tooltipComponentImport = Object.values(tooltipFiles).find((importFn) => {
-    const match = importFn.toString().match(/\/tooltip\/(.+?)\.vue/);
-    return match && match[1] === extractedName;
-  });
+  const tooltipFileName = tooltipPath ? tooltipPath.split('/').pop()?.replace('.vue', '') : undefined;
 
-  if (tooltipComponentImport) {
-    const component = defineAsyncComponent(() => tooltipComponentImport().then((c: any) => c.default as Component));
+  let component: any;
 
-    render(h(component), container);
+  if (tooltipFileName) {
+    component = defineAsyncComponent(() => import(`../tooltip/${tooltipFileName}.vue`));
   }
+
+  render(h(component), container);
 }
