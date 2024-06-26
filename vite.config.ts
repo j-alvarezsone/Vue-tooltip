@@ -19,9 +19,6 @@ export default defineConfig({
           // options for the plugin
         }),
       ],
-      output: {
-        sourcemap: true, // Ensure sourcemaps are enabled for all outputs
-      },
     },
     // Additional option to retain class names and function names in production for better debugging
     minify: 'terser', // Use Terser for minification
