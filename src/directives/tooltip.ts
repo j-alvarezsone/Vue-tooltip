@@ -724,22 +724,27 @@ function isOutOfBounds(container: HTMLDivElement, arg: DirectiveBinding['arg'], 
   );
 }
 
-function loadDynamicComponent(value: any, container: HTMLDivElement) {
-  const filePath = value.__file || value.content.__file;
-  const extractedName = filePath
-    .split('/')
-    .pop()
-    ?.replace(/\.(vue|md)$/, '');
+function loadDynamicComponent(value: any, container: HTMLElement) {
+  // Determine the component path
+  const componentPath = value.__file || (value.content && value.content.__file);
 
-  import(`../tooltip/${extractedName}.vue`).then((module) => {
-    const Component = module.default;
+  console.log('componentPath', componentPath);
+  import(componentPath)
+    .then((module) => {
+      const Component = module.default;
+      if (app !== null) {
+        app.unmount();
+      }
 
-    app = createApp({
-      render() {
-        return h(Component);
-      },
+      app = createApp({
+        render() {
+          return h(Component);
+        },
+      });
+
+      app.mount(container);
+    })
+    .catch((error) => {
+      console.error('Failed to load dynamic component:', error);
     });
-
-    app.mount(container);
-  });
 }
