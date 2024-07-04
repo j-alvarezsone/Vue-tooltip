@@ -1,6 +1,4 @@
-import { type Directive, type DirectiveBinding, render, h, nextTick, type VNode } from 'vue';
-
-type ObjectValues<T> = T[keyof T];
+import { type Directive, type DirectiveBinding, render } from 'vue';
 
 const TOOLTIP = {
   DISPLAY: '--tooltip-display',
@@ -32,8 +30,6 @@ const TOOLTIP_PLACEMENTS = {
   RIGHT_START: 'rightStart',
   RIGHT_END: 'rightEnd',
 } as const;
-
-type Placement = ObjectValues<typeof TOOLTIP_PLACEMENTS>;
 
 const tooltipContainer = document.createElement('div');
 let observer: IntersectionObserver | null = null;
@@ -71,8 +67,6 @@ export const tooltip: Directive = {
 };
 
 function updateTooltip(el: HTMLElement, { value, modifiers, arg }: DirectiveBinding, container: HTMLDivElement) {
-  let isComponent = false;
-
   if (typeof value === 'string' || typeof value === 'number') {
     const stringValue = typeof value === 'number' ? value.toString() : value;
 
@@ -83,37 +77,12 @@ function updateTooltip(el: HTMLElement, { value, modifiers, arg }: DirectiveBind
       container.innerText = stringValue;
     }
   } else if (typeof value === 'object') {
-    if (value.__file || (value.content && value.content.__file)) {
-      isComponent = true;
-
-      const vNodes = value.content ? value.content.render() : value.render();
-      const vNodesArray = vNodes.children.map((vNode: VNode) => {
-        const { type, props, children } = vNode;
-
-        return h(type as string, { class: props?.class, innerHTML: children });
-      });
-
-      const parentVNode = h(vNodes.type, { class: vNodes.props?.class }, vNodesArray);
-
-      render(parentVNode, container);
-
-      nextTick(() => {
-        setPlacement(el, container, modifiers, arg, value, value.placement);
-      });
-
-      if (value?.maxWidth) {
-        container.style.setProperty(TOOLTIP.MAX_WIDTH, value.maxWidth);
-      }
-    } else {
-      applyObjectTooltipStyles(value, container);
-    }
+    applyObjectTooltipStyles(value, container);
   }
   container.className = '';
   container.classList.add('tooltip');
 
-  if (!isComponent) {
-    setPlacement(el, container, modifiers, arg, value, value.placement);
-  }
+  setPlacement(el, container, modifiers, arg, value);
 
   if (modifiers.bgLight || value?.bgLight) {
     container.style.setProperty(TOOLTIP.BACKGROUND_COLOR, 'white');
@@ -121,10 +90,7 @@ function updateTooltip(el: HTMLElement, { value, modifiers, arg }: DirectiveBind
   }
 
   if (modifiers.noArrow || value?.noArrow) {
-    if (arrow && document.body.contains(arrow)) {
-      document.body.removeChild(arrow);
-      arrow = null;
-    }
+    removeArrow();
   }
 }
 
@@ -154,6 +120,7 @@ function applyObjectTooltipStyles(value: any, container: HTMLDivElement) {
 
   if (value?.zIndex) {
     container.style.setProperty(TOOLTIP.Z_INDEX, value.zIndex);
+    arrow?.style.setProperty(TOOLTIP.Z_INDEX, value.zIndex);
   }
 }
 
@@ -163,9 +130,8 @@ function setPlacement(
   modifiers: DirectiveBinding['modifiers'],
   arg: DirectiveBinding['arg'],
   value: DirectiveBinding['value'],
-  position: Placement | undefined,
 ) {
-  switch (position || true) {
+  switch (value?.placement || true) {
     case modifiers.left:
     case TOOLTIP_PLACEMENTS.LEFT:
       alignLeft(el, container, modifiers, value);
@@ -286,13 +252,20 @@ function setPlacement(
 function removeTooltip(container: HTMLDivElement, binding: DirectiveBinding, observer: IntersectionObserver | null) {
   container.style.setProperty(TOOLTIP.DISPLAY, 'none');
 
-  if (typeof binding.value === 'string' || typeof binding.value === 'object') {
+  if (typeof binding.value === 'string' || typeof binding.value === 'object' || typeof binding.value === 'number') {
     clearTooltip(binding, container);
   }
 
   if (observer) {
     observer.disconnect();
     observer = null;
+  }
+}
+
+function removeArrow() {
+  if (arrow && document.body.contains(arrow)) {
+    document.body.removeChild(arrow);
+    arrow = null;
   }
 }
 
@@ -310,10 +283,7 @@ function handleMouseEnter(el: HTMLElement, container: HTMLDivElement, binding: D
   if (hideTimeout) {
     clearTimeout(hideTimeout);
     hideTimeout = null;
-    if (arrow && document.body.contains(arrow)) {
-      document.body.removeChild(arrow);
-      arrow = null;
-    }
+    removeArrow();
   }
 
   container.style.setProperty(TOOLTIP.DISPLAY, 'block');
@@ -329,9 +299,10 @@ function handleMouseEnter(el: HTMLElement, container: HTMLDivElement, binding: D
   window.addEventListener('wheel', wheelEventHandler);
 
   el.onclick = () => {
+    removeArrow();
     setTimeout(() => {
       handleMouseLeave(el, container, binding);
-    }, binding.value.hideDelay ?? 300);
+    }, binding.value.hideDelay ?? 50);
   };
 
   container.onmouseenter = () => {
@@ -374,16 +345,11 @@ function clearTooltip({ modifiers, value, arg }: DirectiveBinding, container: HT
     document.body.removeChild(container);
   }
 
-  if (arrow && document.body.contains(arrow)) {
-    document.body.removeChild(arrow);
-    arrow = null;
-  }
+  removeArrow();
 
   if (arg) {
     arg = undefined;
   }
-
-  render(null, tooltipContainer);
 }
 
 function getElRect(el: HTMLElement) {
@@ -403,14 +369,23 @@ function setArrowTopPosition(
 ) {
   const elRect = getElRect(el);
 
-  arrow.style.setProperty(TOOLTIP.ARROW_BORDER_COLOR, '#101828 transparent transparent transparent');
+  arrow.style.setProperty(TOOLTIP.ARROW_BORDER_COLOR, '#1e293b transparent transparent transparent');
 
   if (modifiers.bgLight || value?.bgLight) {
     arrow.style.setProperty(TOOLTIP.ARROW_BORDER_COLOR, 'white transparent transparent transparent');
   }
 
-  const arrowLeft = elRect.left + elRect.width / 2 - arrow.offsetWidth / 2;
+  let arrowLeft = elRect.left + elRect.width / 2 - arrow.offsetWidth / 2;
   const arrowTop = elRect.top - arrow.offsetHeight;
+
+  if (modifiers.topStart || value?.topStart) {
+    arrowLeft = elRect.left + arrow.offsetWidth;
+  }
+
+  if (modifiers.topEnd || value?.topEnd) {
+    arrowLeft = elRect.right - arrow.offsetWidth * 2;
+  }
+
   setPosition(arrow, arrowLeft, arrowTop);
 }
 
@@ -422,14 +397,23 @@ function setArrowBottomPosition(
 ) {
   const elRect = getElRect(el);
 
-  arrow.style.setProperty(TOOLTIP.ARROW_BORDER_COLOR, 'transparent transparent #101828 transparent');
+  arrow.style.setProperty(TOOLTIP.ARROW_BORDER_COLOR, 'transparent transparent #1e293b transparent');
 
   if (modifiers.bgLight || value?.bgLight) {
     arrow.style.setProperty(TOOLTIP.ARROW_BORDER_COLOR, 'transparent transparent white transparent');
   }
 
-  const arrowLeft = elRect.left + elRect.width / 2 - arrow.offsetWidth / 2;
+  let arrowLeft = elRect.left + elRect.width / 2 - arrow.offsetWidth / 2;
   const arrowTop = elRect.bottom;
+
+  if (modifiers.bottomStart || value?.bottomStart) {
+    arrowLeft = elRect.left + arrow.offsetWidth;
+  }
+
+  if (modifiers.bottomEnd || value?.bottomEnd) {
+    arrowLeft = elRect.right - arrow.offsetWidth * 2;
+  }
+
   setPosition(arrow, arrowLeft, arrowTop);
 }
 
@@ -441,14 +425,24 @@ function setArrowLeftPosition(
 ) {
   const elRect = getElRect(el);
 
-  arrow.style.setProperty(TOOLTIP.ARROW_BORDER_COLOR, 'transparent transparent transparent #101828');
+  arrow.style.setProperty(TOOLTIP.ARROW_BORDER_COLOR, 'transparent transparent transparent #1e293b');
 
   if (modifiers.bgLight || value?.bgLight) {
     arrow.style.setProperty(TOOLTIP.ARROW_BORDER_COLOR, 'transparent transparent transparent white');
   }
 
   const arrowLeft = elRect.left - arrow.offsetWidth;
-  const arrowTop = elRect.top + elRect.height / 2 - arrow.offsetHeight / 2;
+
+  let arrowTop = elRect.top + elRect.height / 2 - arrow.offsetHeight / 2;
+
+  if (modifiers.leftStart || value?.leftStart) {
+    arrowTop = elRect.top + arrow.offsetHeight;
+  }
+
+  if (modifiers.leftEnd || value?.leftEnd) {
+    arrowTop = elRect.bottom - arrow.offsetHeight * 2;
+  }
+
   setPosition(arrow, arrowLeft, arrowTop);
 }
 
@@ -460,14 +454,23 @@ function setArrowRightPosition(
 ) {
   const elRect = getElRect(el);
 
-  arrow.style.setProperty(TOOLTIP.ARROW_BORDER_COLOR, 'transparent #101828 transparent transparent');
+  arrow.style.setProperty(TOOLTIP.ARROW_BORDER_COLOR, 'transparent #1e293b transparent transparent');
 
   if (modifiers.bgLight || value?.bgLight) {
     arrow.style.setProperty(TOOLTIP.ARROW_BORDER_COLOR, 'transparent white transparent transparent');
   }
 
+  let arrowTop = elRect.top + elRect.height / 2 - arrow.offsetHeight / 2;
   const arrowLeft = elRect.right;
-  const arrowTop = elRect.top + elRect.height / 2 - arrow.offsetHeight / 2;
+
+  if (modifiers.rightStart || value?.rightStart) {
+    arrowTop = elRect.top + arrow.offsetHeight;
+  }
+
+  if (modifiers.rightEnd || value?.rightEnd) {
+    arrowTop = elRect.bottom - arrow.offsetHeight * 2;
+  }
+
   setPosition(arrow, arrowLeft, arrowTop);
 }
 
