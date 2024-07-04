@@ -51,10 +51,9 @@ v-tooltip.bgLight
 v-tooltip.autoHide
 v-tooltip.html
 
-Content: String(html) or Component
+Content: String(html)
 
 v-tooltip="'Hello World'"
-v-tooltip="Component"
 
 ```
 
@@ -66,7 +65,7 @@ v-tooltip="Component"
 ```
 Placement : top, topStart, topEnd, bottom, bottomStart, bottomEnd, left, leftStart, leftEnd, right, rightStart, rightEnd
 
-Content: String(html) or Component
+Content: String(html)
 
 noArrow: boolean
 bgLight: boolean

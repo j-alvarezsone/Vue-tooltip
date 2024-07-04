@@ -28,15 +28,8 @@
       <p v-tooltip.autoHide="'Auto Hide'">Auto Hide</p>
       <p v-tooltip.html="'<h1>Html</h1>'">Html</p>
     </div>
-    <div class="placement">
-      <p v-tooltip="TooltipTest2">Component</p>
-    </div>
   </div>
 </template>
-
-<script lang="ts" setup>
-  import TooltipTest2 from '../tooltip/TooltipTest2.vue';
-</script>
 
 <style scoped>
   h1 {

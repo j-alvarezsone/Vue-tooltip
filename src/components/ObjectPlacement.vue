@@ -33,15 +33,8 @@
       <p v-tooltip="{ content: 'Z Index', placement: 'top', zIndex: 20 }">Z Index</p>
       <p v-tooltip="{ content: 'Disabled', placement: 'top', disabled: true }">Disabled</p>
     </div>
-    <div class="placement">
-      <p v-tooltip="{ content: TooltipTest, placement: 'top', maxWidth: '1000px' }">Component</p>
-    </div>
   </div>
 </template>
-
-<script lang="ts" setup>
-  import TooltipTest from '../tooltip/TooltipTest.vue';
-</script>
 
 <style scoped>
   h1 {
