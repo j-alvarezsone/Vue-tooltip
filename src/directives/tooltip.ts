@@ -14,6 +14,7 @@ const TOOLTIP = {
   PADDING: '--tooltip-padding',
   Z_INDEX: '--tooltip-zIndex',
   ARROW_BORDER_COLOR: '--tooltip-arrowBorderColor',
+  ARROW_DISPLAY: '--tooltip-arrow-display',
 } as const;
 
 const TOOLTIP_PLACEMENTS = {
@@ -63,6 +64,12 @@ export const tooltip: Directive = {
       observer.disconnect();
       observer = null;
     }
+
+    if (document.body.contains(tooltipContainer)) {
+      document.body.removeChild(tooltipContainer);
+    }
+
+    removeArrow();
   },
 };
 
@@ -79,6 +86,7 @@ function updateTooltip(el: HTMLElement, { value, modifiers, arg }: DirectiveBind
   } else if (typeof value === 'object') {
     applyObjectTooltipStyles(value, container);
   }
+
   container.className = '';
   container.classList.add('tooltip');
 
@@ -250,8 +258,6 @@ function setPlacement(
 }
 
 function removeTooltip(container: HTMLDivElement, binding: DirectiveBinding, observer: IntersectionObserver | null) {
-  container.style.setProperty(TOOLTIP.DISPLAY, 'none');
-
   if (typeof binding.value === 'string' || typeof binding.value === 'object' || typeof binding.value === 'number') {
     clearTooltip(binding, container);
   }
@@ -291,6 +297,7 @@ function handleMouseEnter(el: HTMLElement, container: HTMLDivElement, binding: D
 
   arrow = document.createElement('div');
   arrow.className = 'tooltip-arrow';
+  arrow?.style.setProperty(TOOLTIP.ARROW_DISPLAY, 'block');
   document.body.appendChild(arrow);
 
   updateTooltip(el, binding, container);
@@ -299,7 +306,6 @@ function handleMouseEnter(el: HTMLElement, container: HTMLDivElement, binding: D
   window.addEventListener('wheel', wheelEventHandler);
 
   el.onclick = () => {
-    removeArrow();
     setTimeout(() => {
       handleMouseLeave(el, container, binding);
     }, binding.value.hideDelay ?? 50);
@@ -335,17 +341,16 @@ function clearTooltip({ modifiers, value, arg }: DirectiveBinding, container: HT
   container.className = '';
   container.style.cssText = '';
 
+  if (arrow) {
+    arrow.className = '';
+    arrow.style.cssText = '';
+  }
+
   if (modifiers.html || value?.html) {
     container.innerHTML = '';
   } else {
     container.innerText = '';
   }
-
-  if (document.body.contains(container)) {
-    document.body.removeChild(container);
-  }
-
-  removeArrow();
 
   if (arg) {
     arg = undefined;
