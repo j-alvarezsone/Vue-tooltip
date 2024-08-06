@@ -1,5 +1,5 @@
 <template>
-  <h1>Modifiers</h1>
+  <h1 class="text-blue-500">Modifiers</h1>
   <br />
   <div class="_container">
     <div class="placement">
