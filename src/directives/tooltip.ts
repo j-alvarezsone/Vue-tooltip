@@ -17,7 +17,7 @@ const TOOLTIP = {
   ARROW_DISPLAY: '--tooltip-arrow-display',
 } as const;
 
-const TOOLTIP_PLACEMENTS = {
+export const TOOLTIP_PLACEMENTS = {
   TOP: 'top',
   TOP_START: 'topStart',
   TOP_END: 'topEnd',

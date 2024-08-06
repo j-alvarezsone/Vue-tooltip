@@ -1,5 +1,5 @@
 <template>
-  <h1 class="text-red-500">Object Placement</h1>
+  <h1 class="text-blue-500">Object Placement</h1>
   <br />
   <div class="_container">
     <div class="placement">
