@@ -305,12 +305,6 @@ function handleMouseEnter(el: HTMLElement, container: HTMLDivElement, binding: D
   wheelEventHandler = () => handleMouseLeave(el, container, binding);
   window.addEventListener('wheel', wheelEventHandler);
 
-  el.onclick = () => {
-    setTimeout(() => {
-      handleMouseLeave(el, container, binding);
-    }, binding.value.hideDelay ?? 50);
-  };
-
   container.onmouseenter = () => {
     if (hideTimeout) {
       clearTimeout(hideTimeout);
@@ -334,7 +328,6 @@ function handleMouseLeave(el: HTMLElement, container: HTMLDivElement, binding: D
   }
 
   container.onmouseleave = () => handleMouseLeave(el, container, binding);
-  el.onclick = null;
 }
 
 function clearTooltip({ modifiers, value, arg }: DirectiveBinding, container: HTMLDivElement) {
