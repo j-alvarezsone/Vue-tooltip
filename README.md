@@ -51,7 +51,7 @@ v-tooltip.bgLight
 v-tooltip.autoHide
 v-tooltip.html
 
-Content: String(html)
+Content: string/html
 
 v-tooltip="'Hello World'"
 
@@ -65,7 +65,7 @@ v-tooltip="'Hello World'"
 ```
 Placement : top, topStart, topEnd, bottom, bottomStart, bottomEnd, left, leftStart, leftEnd, right, rightStart, rightEnd
 
-Content: String(html)
+Content: string/html
 
 noArrow: boolean
 bgLight: boolean
@@ -79,4 +79,54 @@ hideDelay: number
 disabled: boolean
 
 v-tooltip="{ content: 'Hello World', placement: 'top' }"
+```
+
+<br>
+<b>component</b>
+
+<p>Props</p>
+
+```
+Placement : top, topStart, topEnd, bottom, bottomStart, bottomEnd, left, leftStart, leftEnd, right, rightStart, rightEnd
+content: string
+delay: number
+noArrow: boolean
+bgLight: boolean
+autoHide: boolean
+html: boolean
+fontSize: string, example("1rem, 10px, 1em")
+padding: string
+maxWidth: string | number
+maxHeight: string | number
+zIndex: number
+disabled: boolean
+```
+
+<p>Slots</p>
+
+```
+default slot - slotProps: event
+content slot
+```
+
+
+<pre>
+import Tooltip from 'path/to/Tooltip.vue';
+</pre>
+
+```
+  <Tooltip content="This is tooltip component">
+    <template #default="{ event }">
+      <span v-on="event.on"> hover over me </span>
+    </template>
+  </Tooltip>
+  
+  <Tooltip placement="bottom">
+    <template #default="{ event }">
+      <span v-on="event.on"> hover over me </span>
+    </template>
+    <template #content>
+      <TooltipInformation />
+    </template>
+  </Tooltip>
 ```
