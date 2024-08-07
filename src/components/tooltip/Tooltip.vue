@@ -3,7 +3,7 @@
     <slot :event="event" />
     <teleport to="body">
       <div
-        v-if="isTooltipVisible"
+        v-if="isTooltipVisible && !disabled"
         ref="tooltipContainerRef"
         class="tooltip_container"
         @mouseenter="keepTooltipVisible"
@@ -51,6 +51,7 @@
     zIndex?: number;
     html?: boolean;
     autoHide?: boolean;
+    disabled?: boolean;
   };
 
   const props = withDefaults(defineProps<Props>(), {
@@ -66,6 +67,7 @@
     zIndex: 9999,
     html: false,
     autoHide: false,
+    disabled: false,
   });
 
   const targetRef = ref<HTMLElement | null>(null);

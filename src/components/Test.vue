@@ -17,7 +17,7 @@
         <span v-on="event.on"> hover over me </span>
       </template>
     </Tooltip>
-    <Tooltip content="This is tooltip component" placement="bottom">
+    <Tooltip placement="bottom">
       <template #default="{ event }">
         <span v-on="event.on"> hover over me </span>
       </template>
