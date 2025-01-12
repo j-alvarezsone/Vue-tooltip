@@ -36,7 +36,6 @@ export const TOOLTIP_PLACEMENTS = {
 export type TooltipPlacement = ObjectValues<typeof TOOLTIP_PLACEMENTS>;
 
 const tooltipContainer = document.createElement('div');
-let observer: IntersectionObserver | null = null;
 let hideTimeout: number | null = null;
 let wheelEventHandler: (() => void) | null = null;
 let arrow: HTMLElement | null = null;
@@ -62,11 +61,6 @@ export const tooltip: Directive = {
     tooltipContainer.onmouseenter = null;
     tooltipContainer.onmouseleave = null;
     render(null, tooltipContainer);
-
-    if (observer) {
-      observer.disconnect();
-      observer = null;
-    }
 
     if (document.body.contains(tooltipContainer)) {
       document.body.removeChild(tooltipContainer);
@@ -260,14 +254,9 @@ function setPlacement(
   }
 }
 
-function removeTooltip(container: HTMLDivElement, binding: DirectiveBinding, observer: IntersectionObserver | null) {
+function removeTooltip(container: HTMLDivElement, binding: DirectiveBinding) {
   if (typeof binding.value === 'string' || typeof binding.value === 'object' || typeof binding.value === 'number') {
     clearTooltip(binding, container);
-  }
-
-  if (observer) {
-    observer.disconnect();
-    observer = null;
   }
 }
 
@@ -318,10 +307,10 @@ function handleMouseEnter(el: HTMLElement, container: HTMLDivElement, binding: D
 
 function handleMouseLeave(el: HTMLElement, container: HTMLDivElement, binding: DirectiveBinding) {
   if (binding.modifiers.autoHide || binding.value?.autoHide) {
-    removeTooltip(container, binding, observer);
+    removeTooltip(container, binding);
   } else {
     hideTimeout = window.setTimeout(() => {
-      removeTooltip(container, binding, observer);
+      removeTooltip(container, binding);
     }, 50);
   }
 
