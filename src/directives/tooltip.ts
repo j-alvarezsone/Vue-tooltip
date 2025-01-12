@@ -143,7 +143,7 @@ function setPlacement(
     case modifiers.left:
     case TOOLTIP_PLACEMENTS.LEFT:
       alignLeft(el, container, modifiers, value);
-      isOutOfBounds(container, arg, (isOut) => {
+      isOutOfBounds(container, (isOut) => {
         if (isOut) {
           alignRight(el, container, modifiers, value);
         }
@@ -152,7 +152,7 @@ function setPlacement(
     case modifiers.leftStart:
     case TOOLTIP_PLACEMENTS.LEFT_START:
       alignLeftStart(el, container, modifiers, value);
-      isOutOfBounds(container, arg, (isOut) => {
+      isOutOfBounds(container, (isOut) => {
         if (isOut) {
           alignRightStart(el, container, modifiers, value);
         }
@@ -161,7 +161,7 @@ function setPlacement(
     case modifiers.leftEnd:
     case TOOLTIP_PLACEMENTS.LEFT_END:
       alignLeftEnd(el, container, modifiers, value);
-      isOutOfBounds(container, arg, (isOut) => {
+      isOutOfBounds(container, (isOut) => {
         if (isOut) {
           alignRightEnd(el, container, modifiers, value);
         }
@@ -170,7 +170,7 @@ function setPlacement(
     case modifiers.right:
     case TOOLTIP_PLACEMENTS.RIGHT:
       alignRight(el, container, modifiers, value);
-      isOutOfBounds(container, arg, (isOut) => {
+      isOutOfBounds(container, (isOut) => {
         if (isOut) {
           alignLeft(el, container, modifiers, value);
         }
@@ -179,7 +179,7 @@ function setPlacement(
     case modifiers.rightStart:
     case TOOLTIP_PLACEMENTS.RIGHT_START:
       alignRightStart(el, container, modifiers, value);
-      isOutOfBounds(container, arg, (isOut) => {
+      isOutOfBounds(container, (isOut) => {
         if (isOut) {
           alignLeftStart(el, container, modifiers, value);
         }
@@ -188,7 +188,7 @@ function setPlacement(
     case modifiers.rightEnd:
     case TOOLTIP_PLACEMENTS.RIGHT_END:
       alignRightEnd(el, container, modifiers, value);
-      isOutOfBounds(container, arg, (isOut) => {
+      isOutOfBounds(container, (isOut) => {
         if (isOut) {
           alignLeftEnd(el, container, modifiers, value);
         }
@@ -197,7 +197,7 @@ function setPlacement(
     case modifiers.bottom:
     case TOOLTIP_PLACEMENTS.BOTTOM:
       alignBottom(el, container, modifiers, value);
-      isOutOfBounds(container, arg, (isOut) => {
+      isOutOfBounds(container, (isOut) => {
         if (isOut) {
           alignTop(el, container, modifiers, value);
         }
@@ -206,7 +206,7 @@ function setPlacement(
     case modifiers.bottomStart:
     case TOOLTIP_PLACEMENTS.BOTTOM_START:
       alignBottomStart(el, container, modifiers, value);
-      isOutOfBounds(container, arg, (isOut) => {
+      isOutOfBounds(container, (isOut) => {
         if (isOut) {
           alignTopStart(el, container, modifiers, value);
         }
@@ -215,7 +215,7 @@ function setPlacement(
     case modifiers.bottomEnd:
     case TOOLTIP_PLACEMENTS.BOTTOM_END:
       alignBottomEnd(el, container, modifiers, value);
-      isOutOfBounds(container, arg, (isOut) => {
+      isOutOfBounds(container, (isOut) => {
         if (isOut) {
           alignTopEnd(el, container, modifiers, value);
         }
@@ -224,7 +224,7 @@ function setPlacement(
     case modifiers.topStart:
     case TOOLTIP_PLACEMENTS.TOP_START:
       alignTopStart(el, container, modifiers, value);
-      isOutOfBounds(container, arg, (isOut) => {
+      isOutOfBounds(container, (isOut) => {
         if (isOut) {
           alignBottomStart(el, container, modifiers, value);
         }
@@ -233,7 +233,7 @@ function setPlacement(
     case modifiers.topEnd:
     case TOOLTIP_PLACEMENTS.TOP_END:
       alignTopEnd(el, container, modifiers, value);
-      isOutOfBounds(container, arg, (isOut) => {
+      isOutOfBounds(container, (isOut) => {
         if (isOut) {
           alignBottomEnd(el, container, modifiers, value);
         }
@@ -241,7 +241,7 @@ function setPlacement(
       break;
     case TOOLTIP_PLACEMENTS.TOP:
       alignTop(el, container, modifiers, value);
-      isOutOfBounds(container, arg, (isOut) => {
+      isOutOfBounds(container, (isOut) => {
         if (isOut) {
           alignBottom(el, container, modifiers, value);
         }
@@ -249,7 +249,7 @@ function setPlacement(
       break;
     default:
       alignTop(el, container, modifiers, value);
-      isOutOfBounds(container, arg, (isOut) => {
+      isOutOfBounds(container, (isOut) => {
         if (isOut) {
           alignBottom(el, container, modifiers, value);
         }
@@ -688,23 +688,8 @@ function alignRightEnd(
   }
 }
 
-function isOutOfBounds(container: HTMLDivElement, arg: DirectiveBinding['arg'], cb: (isOut: boolean) => void) {
-  const observerEl = document.querySelector(`.${typeof arg === 'string' ? arg : null}`);
+function isOutOfBounds(container: HTMLDivElement, cb: (isOut: boolean) => void) {
   const containerRect = container.getBoundingClientRect();
-
-  if (observerEl) {
-    observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          cb(!entry.isIntersecting);
-        });
-      },
-      { root: observerEl, rootMargin: '0px', threshold: 1.0 },
-    );
-
-    observer.observe(container);
-    return;
-  }
 
   const width = container.offsetWidth;
   const height = container.offsetHeight;
