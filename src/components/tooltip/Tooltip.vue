@@ -21,27 +21,13 @@
 
 <script lang="ts" setup>
   import { ref, reactive, nextTick, computed } from 'vue';
-  import { TOOLTIP_PLACEMENTS } from '../../directives/tooltip';
+  import { TOOLTIP_PLACEMENTS, type TooltipPlacement } from '../../directives/tooltip';
   import { useEventListener } from '../../composables/useEventListener';
-
-  type Placement =
-    | 'top'
-    | 'topStart'
-    | 'topEnd'
-    | 'bottom'
-    | 'bottomStart'
-    | 'bottomEnd'
-    | 'left'
-    | 'leftStart'
-    | 'leftEnd'
-    | 'right'
-    | 'rightStart'
-    | 'rightEnd';
 
   type Props = {
     content?: string;
     delay?: number;
-    placement?: Placement;
+    placement?: TooltipPlacement;
     noArrow?: boolean;
     bgLight?: boolean;
     maxHeight?: string | number;

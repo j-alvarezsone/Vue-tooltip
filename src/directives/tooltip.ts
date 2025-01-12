@@ -1,4 +1,5 @@
 import { type Directive, type DirectiveBinding, render } from 'vue';
+import type { ObjectValues } from '../type';
 
 const TOOLTIP = {
   DISPLAY: '--tooltip-display',
@@ -31,6 +32,8 @@ export const TOOLTIP_PLACEMENTS = {
   RIGHT_START: 'rightStart',
   RIGHT_END: 'rightEnd',
 } as const;
+
+export type TooltipPlacement = ObjectValues<typeof TOOLTIP_PLACEMENTS>;
 
 const tooltipContainer = document.createElement('div');
 let observer: IntersectionObserver | null = null;
