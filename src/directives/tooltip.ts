@@ -263,6 +263,8 @@ function removeTooltip(container: HTMLDivElement, binding: DirectiveBinding) {
 function removeArrow() {
   if (arrow && document.body.contains(arrow)) {
     document.body.removeChild(arrow);
+    arrow.className = '';
+    arrow.style.cssText = '';
     arrow = null;
   }
 }
