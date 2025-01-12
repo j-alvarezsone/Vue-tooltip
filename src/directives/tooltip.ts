@@ -272,10 +272,8 @@ function removeArrow() {
 function handleMouseEnter(el: HTMLElement, container: HTMLDivElement, binding: DirectiveBinding) {
   const isValueMissing = !binding.value;
   const isContentMissing = typeof binding.value === 'object' && !binding.value.content;
-  const isFilePresent =
-    binding.value && (binding.value.__file || (binding.value.content && binding.value.content.__file));
 
-  if (((isValueMissing || isContentMissing) && !isFilePresent) || binding.value?.disabled) {
+  if (isValueMissing || isContentMissing || binding.value?.disabled) {
     clearTooltip(binding, container);
     return;
   }
@@ -283,6 +281,9 @@ function handleMouseEnter(el: HTMLElement, container: HTMLDivElement, binding: D
   if (hideTimeout) {
     clearTimeout(hideTimeout);
     hideTimeout = null;
+  }
+
+  if (arrow) {
     removeArrow();
   }
 
@@ -329,8 +330,7 @@ function clearTooltip({ modifiers, value, arg }: DirectiveBinding, container: HT
   container.style.cssText = '';
 
   if (arrow) {
-    arrow.className = '';
-    arrow.style.cssText = '';
+    removeArrow();
   }
 
   if (modifiers.html || value?.html) {
