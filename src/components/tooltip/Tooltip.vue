@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive, nextTick, computed } from 'vue';
+  import { ref, reactive, nextTick, computed, watch } from 'vue';
   import { TOOLTIP_PLACEMENTS, type TooltipPlacement } from '../../directives/tooltip';
   import { useEventListener } from '../../composables/useEventListener';
 
@@ -38,6 +38,7 @@
     html?: boolean;
     autoHide?: boolean;
     disabled?: boolean;
+    eventOnClick?: boolean;
   };
 
   const props = withDefaults(defineProps<Props>(), {
@@ -63,17 +64,46 @@
   const isMouseOverTooltip = ref<boolean>(false);
   const hideTimeout = ref<number | null>(null);
   const arrowBorderColor = ref<string>('#1e293b transparent transparent transparent');
+  const observer = ref<ResizeObserver>();
 
   const event = reactive({
     on: {
       mouseenter: (e: MouseEvent) => {
-        handleMouseEnter(e);
+        if (!props.eventOnClick) {
+          handleMouseEnter(e);
+        }
       },
       mouseleave: () => {
         handleMouseLeave();
       },
+      click: (e: MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (props.eventOnClick) {
+          handleMouseEnter(e);
+        }
+      },
     },
   });
+
+  watch(
+    () => tooltipContainerRef.value,
+    () => {
+      if (tooltipContainerRef.value) {
+        observer.value = new ResizeObserver((entires) => {
+          entires.forEach(() => {
+            if (targetRef.value) {
+              setPlacement(getElRect(targetRef.value));
+            }
+          });
+        });
+        observer.value.observe(tooltipContainerRef.value);
+      } else {
+        observer.value?.disconnect();
+      }
+    },
+    { immediate: true },
+  );
 
   const fontSize = computed(() => {
     if (!isValidFontSize(props.fontSize)) {
