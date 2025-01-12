@@ -376,11 +376,11 @@ function setArrowTopPosition(
   let arrowLeft = elRect.left + elRect.width / 2 - arrow.offsetWidth / 2;
   const arrowTop = elRect.top - arrow.offsetHeight;
 
-  if (modifiers.topStart || value?.topStart) {
+  if (modifiers.topStart || value?.placement) {
     arrowLeft = elRect.left + arrow.offsetWidth;
   }
 
-  if (modifiers.topEnd || value?.topEnd) {
+  if (modifiers.topEnd || value?.placement) {
     arrowLeft = elRect.right - arrow.offsetWidth * 2;
   }
 
@@ -404,11 +404,11 @@ function setArrowBottomPosition(
   let arrowLeft = elRect.left + elRect.width / 2 - arrow.offsetWidth / 2;
   const arrowTop = elRect.bottom;
 
-  if (modifiers.bottomStart || value?.bottomStart) {
+  if (modifiers.bottomStart || value?.placement) {
     arrowLeft = elRect.left + arrow.offsetWidth;
   }
 
-  if (modifiers.bottomEnd || value?.bottomEnd) {
+  if (modifiers.bottomEnd || value?.placement) {
     arrowLeft = elRect.right - arrow.offsetWidth * 2;
   }
 
@@ -433,11 +433,11 @@ function setArrowLeftPosition(
 
   let arrowTop = elRect.top + elRect.height / 2 - arrow.offsetHeight / 2;
 
-  if (modifiers.leftStart || value?.leftStart) {
+  if (modifiers.leftStart || value?.placement) {
     arrowTop = elRect.top + arrow.offsetHeight;
   }
 
-  if (modifiers.leftEnd || value?.leftEnd) {
+  if (modifiers.leftEnd || value?.placement) {
     arrowTop = elRect.bottom - arrow.offsetHeight * 2;
   }
 
@@ -461,11 +461,11 @@ function setArrowRightPosition(
   let arrowTop = elRect.top + elRect.height / 2 - arrow.offsetHeight / 2;
   const arrowLeft = elRect.right;
 
-  if (modifiers.rightStart || value?.rightStart) {
+  if (modifiers.rightStart || value?.placement) {
     arrowTop = elRect.top + arrow.offsetHeight;
   }
 
-  if (modifiers.rightEnd || value?.rightEnd) {
+  if (modifiers.rightEnd || value?.placement) {
     arrowTop = elRect.bottom - arrow.offsetHeight * 2;
   }
 
